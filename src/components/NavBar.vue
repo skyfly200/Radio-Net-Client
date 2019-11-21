@@ -1,34 +1,19 @@
 <template>
   <v-app-bar app color="primary" dark>
     <div class="d-flex align-center">
-      <v-img
-        alt="Vuetify Logo"
-        class="shrink mr-2"
-        contain
-        src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
-        transition="scale-transition"
-        width="40"
-      />
-
-      <v-img
-        alt="Vuetify Name"
-        class="shrink mt-1 hidden-sm-and-down"
-        contain
-        min-width="100"
-        src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-        width="100"
-      />
+      <v-btn to="/">
+        <v-icon>mdi-bullhorn</v-icon>
+        <span>Radio Net</span>
+      </v-btn>
     </div>
 
     <v-spacer></v-spacer>
 
-    <v-btn to="/register" text>
-      <span class="mr-2">Login</span>
-      <v-icon>mdi-login</v-icon>
+    <v-btn to="/login" icon>
+      <v-icon>mdi-login-variant</v-icon>
     </v-btn>
-    <v-btn to="/login" text>
-      <span class="mr-2">Sign Up</span>
-      <v-icon>mdi-sign-up</v-icon>
+    <v-btn to="/register" icon>
+      <v-icon>mdi-account-plus</v-icon>
     </v-btn>
   </v-app-bar>
 </template>
