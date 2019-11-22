@@ -9,12 +9,19 @@
 
     <v-spacer></v-spacer>
 
-    <v-btn to="/login" icon>
-      <v-icon>mdi-login-variant</v-icon>
-    </v-btn>
-    <v-btn to="/register" icon>
-      <v-icon>mdi-account-plus</v-icon>
-    </v-btn>
+    <template v-if="!user.loggedIn">
+      <v-btn to="/login" icon>
+        <v-icon>mdi-login-variant</v-icon>
+      </v-btn>
+      <v-btn to="/register" icon>
+        <v-icon>mdi-account-plus</v-icon>
+      </v-btn>
+    </template>
+    <template v-else>
+      <v-btn @click="signOut" icon>
+        <v-icon>mdi-logout-variant</v-icon>
+      </v-btn>
+    </template>
   </v-app-bar>
 </template>
 <script>
