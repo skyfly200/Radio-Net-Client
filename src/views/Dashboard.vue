@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-title>Dashboard</v-card-title>
-    <v-card-subtitle><login-status/></v-card-subtitle>
+    <v-card-text><login-status /></v-card-text>
   </v-card>
 </template>
 <script>

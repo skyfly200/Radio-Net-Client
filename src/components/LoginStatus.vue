@@ -1,15 +1,41 @@
 <template>
-  <div v-if="user.loggedIn" class="alert alert-success" role="alert">You are logged in!</div>
-  <v-btn v-else>Login</v-btn>
+  <div>
+    <h1>Signup succeeded</h1>
+    <button @click="logOut">Log out</button>
+    <hr />
+    <img :src="photo" style="height: 120px" /> <br />
+    <p>{{ name }}</p>
+    <p>{{ email }}</p>
+    <p>{{ userId }}</p>
+    <hr />
+    <pre>{{ user }}</pre>
+  </div>
 </template>
 <script>
-import { mapGetters } from "vuex";
+import firebase from "firebase";
 export default {
-  computed: {
-    // map `this.user` to `this.$store.getters.user`
-    ...mapGetters({
-      user: "user"
-    })
+  data() {
+    return {
+      photo: "",
+      userId: "",
+      name: "",
+      email: "",
+      user: {}
+    };
+  },
+  created() {
+    this.user = firebase.auth().currentUser;
+    if (this.user) {
+      this.name = this.user.displayName;
+      this.email = this.user.email;
+      this.photo = this.user.photoURL;
+      this.userId = this.user.uid;
+    }
+  },
+  methods: {
+    logOut() {
+      firebase.auth().signOut();
+    }
   }
 };
 </script>
