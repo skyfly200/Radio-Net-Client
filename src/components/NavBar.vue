@@ -6,15 +6,15 @@
       Radio Net
     </v-btn>
     <v-spacer></v-spacer>
-    <!-- navigation bar links -->
-    <v-btn text class="hidden-xs-only" v-for="item in items" :key="item.title" :to="item.link">
-      <v-icon class="mr-2" right>{{ item.icon }}</v-icon>
-      <span>{{ item.title }}</span>
-    </v-btn>
     <!-- sign out button -->
-    <v-btn text class="hidden-xs-only">
+    <v-btn text v-if="false" class="hidden-xs-only">
       <v-icon class="mr-2" right>mdi-logout-variant</v-icon>
       <span>Logout</span>
+    </v-btn>
+    <!-- navigation bar links -->
+    <v-btn text v-else class="hidden-xs-only" v-for="item in items" :key="item.title" :to="item.link">
+      <v-icon class="mr-2" right>{{ item.icon }}</v-icon>
+      <span>{{ item.title }}</span>
     </v-btn>
   </v-app-bar>
 </template>
@@ -25,12 +25,12 @@ export default {
       let menuItems = [
         {
           title: "Register",
-          icon: "mdi-login-variant",
+          icon: "mdi-account-plus",
           link: "/register"
         },
         {
           title: "Login",
-          icon: "mdi-account-plus",
+          icon: "mdi-login-variant",
           link: "/login"
         }
       ];

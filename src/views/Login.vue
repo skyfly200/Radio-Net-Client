@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-layout row wrap>
-      <v-flex>
+      <v-flex class="mx-5">
         <v-form
           ref="form"
           v-model="valid"
@@ -19,7 +19,7 @@
             :rules="passwordRules"
             label="Password"
             required
-            :append-icon="passwordShow ? 'visibility' : 'visibility_off'"
+            :append-icon="passwordShow ? 'mdi-eye' : 'mdi-eye-off'"
             :type="passwordShow ? 'text' : 'password'"
              @click:append="passwordShow = !passwordShow"
           ></v-text-field>
@@ -38,6 +38,9 @@
           >
             Reset Form
           </v-btn>
+          <v-alert class="ma-4" v-if="error !== ''" type="error">
+            {{ error }}
+          </v-alert>
         </v-form>
       </v-flex>
     </v-layout>
@@ -58,11 +61,13 @@ export default {
     password: '',
     passwordRules: [
       v => !!v || 'Password is Required'
-    ]
+    ],
+    error: ''
   }),
   methods: {
     validate () {
       if (this.$refs.form.validate()) {
+        this.error = ''
         this.snackbar = true
         this.loginWithFirebase()
       }
@@ -73,12 +78,11 @@ export default {
     loginWithFirebase () {
       firebase.auth().signInWithEmailAndPassword(this.email, this.password)
         .then((response) => {
-          alert('success')
           console.log(response)
         })
         .catch((error) => {
-          alert('failure')
           console.log(error)
+          this.error = error.message
         })
     }
   }

@@ -21,17 +21,17 @@
             required
             :append-icon="passwordShow ? 'mdi-eye' : 'mdi-eye-off'"
             :type="passwordShow ? 'text' : 'password'"
-             @click:append="passwordShow = !passwordShow"
+            @click:append="passwordShow = !passwordShow"
           ></v-text-field>
 
           <v-text-field
             v-model="confirmPassword"
-            label="confirm Password"
+            label="Confirm Password"
             :rules="passwordRules"
             required
             :append-icon="confirmPasswordShow ? 'mdi-eye' : 'mdi-eye-off'"
-            :type="confirmPasswordShow ? 'text' : 'password'"
-             @click:append="confirmPasswordShow = !confirmPasswordShow"
+            :type="passwordShow ? 'text' : 'password'"
+            @click:append="passwordShow = !passwordShow"
           ></v-text-field>
 
           <v-btn
@@ -48,6 +48,9 @@
           >
             Reset Form
           </v-btn>
+          <v-alert class="ma-4" v-if="error !== ''" type="error">
+            {{ error }}
+          </v-alert>
         </v-form>
       </v-flex>
     </v-layout>
@@ -70,24 +73,24 @@ export default {
     password: '',
     confirmPassword: '',
     passwordRules: [
-      v => !!v || 'Password and Confirm password Required'
-    ]
+      v => !!v || 'Password Required'
+    ],
+    error: ''
   }),
   methods: {
     registerWithFirebase () {
-      console.log(process.env.VUE_APP_FIREBASE_API_KEY);
       firebase.auth().createUserWithEmailAndPassword(this.email, this.password)
         .then((response) => {
-          alert('success')
           console.log(response)
         })
         .catch((error) => {
-          alert('failure')
+          this.error = error.message ? error.message : "An error occured";
           console.log(error)
         })
     },
     validate () {
       if (this.$refs.form.validate()) {
+        this.error = "";
         this.registerWithFirebase();
         this.snackbar = true
       }
