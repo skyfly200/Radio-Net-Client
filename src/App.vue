@@ -1,6 +1,6 @@
 <template>
   <v-app id="app">
-    <NavBar />
+    <Nav />
     <v-content>
       <router-view></router-view>
     </v-content>
@@ -9,12 +9,12 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import NavBar from "./components/NavBar.vue";
+import Nav from "./components/Nav.vue";
 import firebase from "firebase";
 
 @Component({
   components: {
-    NavBar
+    Nav
   },
   methods: {}
 })
