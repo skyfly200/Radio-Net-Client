@@ -31,6 +31,11 @@
             {{ error }}
           </v-alert>
         </v-form>
+        <div class="pt-6">
+          <span>or</span>
+        </div>
+        <h3 class="ma-4">Sign in with</h3>
+        <SocialLogin></SocialLogin>
       </v-flex>
     </v-layout>
   </v-container>
@@ -38,7 +43,12 @@
 
 <script>
 import firebase from "firebase";
+import SocialLogin from "@/components/SocialLogin.vue";
+
 export default {
+  components: {
+    SocialLogin
+  },
   computed: {
     error() {
       return this.$store.getters.user;
