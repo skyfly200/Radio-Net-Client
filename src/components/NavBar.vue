@@ -7,12 +7,19 @@
     </v-btn>
     <v-spacer></v-spacer>
     <!-- sign out button -->
-    <v-btn text v-if="false" class="hidden-xs-only">
+    <v-btn text v-if="userLogedIn" @click="signout" class="hidden-xs-only">
       <v-icon class="mr-2" right>mdi-logout-variant</v-icon>
       <span>Logout</span>
     </v-btn>
     <!-- navigation bar links -->
-    <v-btn text v-else class="hidden-xs-only" v-for="item in items" :key="item.title" :to="item.link">
+    <v-btn
+      text
+      v-else
+      class="hidden-xs-only"
+      v-for="item in items"
+      :key="item.title"
+      :to="item.link"
+    >
       <v-icon class="mr-2" right>{{ item.icon }}</v-icon>
       <span>{{ item.title }}</span>
     </v-btn>
@@ -21,6 +28,9 @@
 <script>
 export default {
   computed: {
+    userLogedIn() {
+      return this.$store.getters.user;
+    },
     items() {
       let menuItems = [
         {
@@ -35,6 +45,11 @@ export default {
         }
       ];
       return menuItems;
+    }
+  },
+  methods: {
+    signout() {
+      this.$store.dispatch("signOutAction");
     }
   }
 };

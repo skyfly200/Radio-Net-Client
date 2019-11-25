@@ -1,39 +1,94 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import firebase from "firebase";
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    user: {
-      loggedIn: false,
-      data: null
-    }
-  },
-  getters: {
-    user(state) {
-      return state.user;
-    }
+    user: null,
+    status: null,
+    error: null
   },
   mutations: {
-    SET_LOGGED_IN(state, value) {
-      state.user.loggedIn = value;
+    setUser(state, payload) {
+      state.user = payload;
     },
-    SET_USER(state, data) {
-      state.user.data = data;
+
+    removeUser(state) {
+      state.user = null;
+    },
+
+    setStatus(state, payload) {
+      state.status = payload;
+    },
+
+    setError(state, payload) {
+      state.error = payload;
     }
   },
   actions: {
-    fetchUser({ commit }, user) {
-      commit("SET_LOGGED_IN", user !== null);
-      if (user) {
-        commit("SET_USER", {
-          displayName: user.displayName,
-          email: user.email
+    signUpAction({ commit }, payload) {
+      commit("setStatus", "loading");
+      firebase
+        .auth()
+        .createUserWithEmailAndPassword(payload.email, payload.password)
+        .then(response => {
+          alert("success");
+          // response will have user
+          // user will have uid will be updated to the state
+          commit("setUser", response.user);
+          commit("setStatus", "success");
+          commit("setError", null);
+        })
+        .catch(error => {
+          commit("setStatus", "failure");
+          commit("setError", error.message);
         });
-      } else {
-        commit("SET_USER", null);
-      }
+    },
+
+    signInAction({ commit }, payload) {
+      firebase
+        .auth()
+        .signInWithEmailAndPassword(payload.email, payload.password)
+        .then(response => {
+          commit("setUser", response.user);
+          commit("setStatus", "success");
+          commit("setError", null);
+        })
+        .catch(error => {
+          commit("setStatus", "failure");
+          commit("setError", error.message);
+        });
+    },
+
+    signOutAction({ commit }) {
+      firebase
+        .auth()
+        .signOut()
+        .then(response => {
+          commit("setUser", null);
+          commit("setStatus", "success");
+          commit("setError", null);
+        })
+        .catch(error => {
+          commit("setStatus", "failure");
+          commit("setError", error.message);
+        });
+    }
+  },
+
+  getters: {
+    status(state) {
+      return state.status;
+    },
+
+    user(state) {
+      return state.user;
+    },
+
+    error(state) {
+      return state.error;
     }
   }
 });

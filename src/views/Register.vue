@@ -2,11 +2,7 @@
   <v-container>
     <v-layout row wrap>
       <v-flex class="mx-5">
-        <v-form
-          ref="form"
-          v-model="valid"
-          lazy-validation
-          >
+        <v-form ref="form" v-model="valid" lazy-validation>
           <v-text-field
             v-model="email"
             :rules="emailRules"
@@ -34,18 +30,11 @@
             @click:append="passwordShow = !passwordShow"
           ></v-text-field>
 
-          <v-btn
-            :disabled="!valid"
-            color="success"
-            @click="validate"
-          >
+          <v-btn :disabled="!valid" color="success" @click="validate">
             Register
           </v-btn>
 
-          <v-btn
-            color="error"
-            @click="reset"
-          >
+          <v-btn color="error" @click="reset">
             Reset Form
           </v-btn>
           <v-alert class="ma-4" v-if="error !== ''" type="error">
@@ -65,39 +54,34 @@ export default {
     passwordShow: false,
     confirmPasswordShow: false,
     valid: true,
-    email: '',
+    email: "",
     emailRules: [
-      v => !!v || 'E-mail is required',
-      v => /.+@.+/.test(v) || 'E-mail must be valid'
+      v => !!v || "E-mail is required",
+      v => /.+@.+/.test(v) || "E-mail must be valid"
     ],
-    password: '',
-    confirmPassword: '',
-    passwordRules: [
-      v => !!v || 'Password Required'
-    ],
-    error: ''
+    password: "",
+    confirmPassword: "",
+    passwordRules: [v => !!v || "Password Required"],
+    error: ""
   }),
   methods: {
-    registerWithFirebase () {
-      firebase.auth().createUserWithEmailAndPassword(this.email, this.password)
-        .then((response) => {
-          console.log(response)
-        })
-        .catch((error) => {
-          this.error = error.message ? error.message : "An error occured";
-          console.log(error)
-        })
+    registerWithFirebase() {
+      const user = {
+        email: this.email,
+        password: this.password
+      };
+      this.$store.dispatch("signUpAction", user);
     },
-    validate () {
+    validate() {
       if (this.$refs.form.validate()) {
         this.error = "";
         this.registerWithFirebase();
-        this.snackbar = true
+        this.snackbar = true;
       }
     },
-    reset () {
-      this.$refs.form.reset()
+    reset() {
+      this.$refs.form.reset();
     }
   }
-}
+};
 </script>
