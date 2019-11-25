@@ -177,6 +177,7 @@ export default new Vuex.Store({
           commit("setUser", null);
           commit("setStatus", "success");
           commit("setError", null);
+          router.push("login");
         })
         .catch(error => {
           commit("setStatus", "failure");
