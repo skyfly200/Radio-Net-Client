@@ -1,5 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import router from "../router";
 import firebase from "firebase";
 
 Vue.use(Vuex);
@@ -40,6 +41,7 @@ export default new Vuex.Store({
           commit("setUser", response.user);
           commit("setStatus", "success");
           commit("setError", null);
+          router.push("dashboad");
         })
         .catch(error => {
           commit("setStatus", "failure");
@@ -58,6 +60,7 @@ export default new Vuex.Store({
             commit("setUser", result.user);
             commit("setStatus", "success");
             commit("setError", null);
+            router.push("dashboad");
           } else {
             commit("setStatus", "failure");
           }
@@ -83,6 +86,7 @@ export default new Vuex.Store({
             commit("setUser", result.user);
             commit("setStatus", "success");
             commit("setError", null);
+            router.push("dashboad");
           } else {
             commit("setStatus", "failure");
           }
@@ -108,6 +112,7 @@ export default new Vuex.Store({
             commit("setUser", result.user);
             commit("setStatus", "success");
             commit("setError", null);
+            router.push("dashboad");
           } else {
             commit("setStatus", "failure");
           }
@@ -133,6 +138,7 @@ export default new Vuex.Store({
             commit("setUser", result.user);
             commit("setStatus", "success");
             commit("setError", null);
+            router.push("dashboad");
           } else {
             commit("setStatus", "failure");
           }
@@ -155,6 +161,7 @@ export default new Vuex.Store({
           commit("setUser", response.user);
           commit("setStatus", "success");
           commit("setError", null);
+          router.push("dashboad");
         })
         .catch(error => {
           commit("setStatus", "failure");
