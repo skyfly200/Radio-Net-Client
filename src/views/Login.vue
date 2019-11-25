@@ -27,7 +27,7 @@
           <v-btn color="error" @click="reset">
             Reset Form
           </v-btn>
-          <v-alert class="ma-4" v-if="error !== ''" type="error">
+          <v-alert class="ma-4" v-if="status === 'failure'" type="error">
             {{ error }}
           </v-alert>
         </v-form>
@@ -39,6 +39,14 @@
 <script>
 import firebase from "firebase";
 export default {
+  computed: {
+    error() {
+      return this.$store.getters.user;
+    },
+    status() {
+      return this.$store.getters.status;
+    }
+  },
   data: () => ({
     passwordShow: false,
     valid: true,
@@ -48,8 +56,7 @@ export default {
       v => /.+@.+/.test(v) || "E-mail must be valid"
     ],
     password: "",
-    passwordRules: [v => !!v || "Password is Required"],
-    error: ""
+    passwordRules: [v => !!v || "Password is Required"]
   }),
   methods: {
     validate() {

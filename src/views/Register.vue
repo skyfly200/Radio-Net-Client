@@ -37,10 +37,15 @@
           <v-btn color="error" @click="reset">
             Reset Form
           </v-btn>
-          <v-alert class="ma-4" v-if="error !== ''" type="error">
+          <v-alert class="ma-4" v-if="status === 'failure'" type="error">
             {{ error }}
           </v-alert>
         </v-form>
+        <div class="pt-6">
+          <span>or</span>
+        </div>
+        <h3 class="ma-4">Sign in with</h3>
+        <SocialLogin></SocialLogin>
       </v-flex>
     </v-layout>
   </v-container>
@@ -48,8 +53,20 @@
 
 <script>
 import firebase from "firebase";
+import SocialLogin from "@/components/SocialLogin.vue";
 
 export default {
+  components: {
+    SocialLogin
+  },
+  computed: {
+    error() {
+      return this.$store.getters.error;
+    },
+    status() {
+      return this.$store.getters.status;
+    }
+  },
   data: () => ({
     passwordShow: false,
     confirmPasswordShow: false,
@@ -61,11 +78,10 @@ export default {
     ],
     password: "",
     confirmPassword: "",
-    passwordRules: [v => !!v || "Password Required"],
-    error: ""
+    passwordRules: [v => !!v || "Password Required"]
   }),
   methods: {
-    registerWithFirebase() {
+    registerWithEmail() {
       const user = {
         email: this.email,
         password: this.password
@@ -75,7 +91,7 @@ export default {
     validate() {
       if (this.$refs.form.validate()) {
         this.error = "";
-        this.registerWithFirebase();
+        this.registerWithEmail();
         this.snackbar = true;
       }
     },

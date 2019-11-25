@@ -18,7 +18,6 @@ var config = {
 };
 firebase.initializeApp(config);
 
-
 new Vue({
   router,
   store,
