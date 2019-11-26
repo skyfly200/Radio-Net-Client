@@ -1,5 +1,15 @@
 <template>
   <div class="home">
-    <h1>This is a home page</h1>
+    <h1>Community Radio Network</h1>
+    <Chat />
   </div>
 </template>
+<script>
+import Chat from "@/components/Chat.vue";
+
+export default {
+  components: {
+    Chat
+  }
+};
+</script>
