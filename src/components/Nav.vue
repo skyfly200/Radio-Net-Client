@@ -18,6 +18,25 @@
             <v-list-item-title>About</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+        <template v-if="userLogedIn">
+          <v-divider></v-divider>
+          <v-list-item link on="/dashboard">
+            <v-list-item-action>
+              <v-icon>mdi-account</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>Dashboard</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item link @click="signout">
+            <v-list-item-action>
+              <v-icon>mdi-logout-variant</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>Signout</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </template>
       </v-list>
     </v-navigation-drawer>
     <v-app-bar app dense dark>
