@@ -38,7 +38,7 @@ export default new Vuex.Store({
           commit("setUser", response.user);
           commit("setStatus", "success");
           commit("setError", null);
-          router.push("dashboad");
+          router.push("dashboard");
         })
         .catch(error => {
           commit("setStatus", "failure");
@@ -57,7 +57,7 @@ export default new Vuex.Store({
             commit("setUser", result.user);
             commit("setStatus", "success");
             commit("setError", null);
-            router.push("dashboad");
+            router.push("dashboard");
           } else {
             commit("setStatus", "failure");
           }
@@ -83,7 +83,7 @@ export default new Vuex.Store({
             commit("setUser", result.user);
             commit("setStatus", "success");
             commit("setError", null);
-            router.push("dashboad");
+            router.push("dashboard");
           } else {
             commit("setStatus", "failure");
           }
@@ -109,7 +109,7 @@ export default new Vuex.Store({
             commit("setUser", result.user);
             commit("setStatus", "success");
             commit("setError", null);
-            router.push("dashboad");
+            router.push("dashboard");
           } else {
             commit("setStatus", "failure");
           }
@@ -132,7 +132,7 @@ export default new Vuex.Store({
           commit("setUser", response.user);
           commit("setStatus", "success");
           commit("setError", null);
-          router.push("dashboad");
+          router.push("dashboard");
         })
         .catch(error => {
           commit("setStatus", "failure");
