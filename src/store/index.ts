@@ -48,7 +48,7 @@ export default new Vuex.Store({
 
     googleSignIn({ commit }) {
       commit("setStatus", "loading");
-      var provider = new firebase.auth.FacebookAuthProvider();
+      var provider = new firebase.auth.GoogleAuthProvider();
       firebase
         .auth()
         .signInWithPopup(provider)
