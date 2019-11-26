@@ -1,14 +1,12 @@
 <template>
   <div>
-    <h1>Signup succeeded</h1>
-    <button @click="logOut">Log out</button>
-    <hr />
     <img :src="photo" style="height: 120px" /> <br />
     <p>{{ name }}</p>
-    <p>{{ email }}</p>
-    <p>{{ userId }}</p>
-    <hr />
-    <pre>{{ user }}</pre>
+    <p>Email: {{ email }}</p>
+    <p>User ID: {{ userId }}</p>
+    <p>Auth Provider: {{ provider }}</p>
+    <p>Last Login: {{ lastLogin }}</p>
+    <p>Joined on: {{ joined }}</p>
   </div>
 </template>
 <script>
@@ -20,6 +18,9 @@ export default {
       userId: "",
       name: "",
       email: "",
+      provider: "",
+      lastLogin: "",
+      joined: "",
       user: {}
     };
   },
@@ -30,11 +31,9 @@ export default {
       this.email = this.user.email;
       this.photo = this.user.photoURL;
       this.userId = this.user.uid;
-    }
-  },
-  methods: {
-    logOut() {
-      firebase.auth().signOut();
+      this.provider = this.user.providerId;
+      this.lastLogin = this.user.lastLoginAt;
+      this.joined = this.user.createdAt;
     }
   }
 };
