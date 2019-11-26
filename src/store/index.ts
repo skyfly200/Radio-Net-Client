@@ -35,9 +35,6 @@ export default new Vuex.Store({
         .auth()
         .createUserWithEmailAndPassword(payload.email, payload.password)
         .then(response => {
-          alert("success");
-          // response will have user
-          // user will have uid will be updated to the state
           commit("setUser", response.user);
           commit("setStatus", "success");
           commit("setError", null);
