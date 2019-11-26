@@ -72,32 +72,6 @@ export default new Vuex.Store({
         });
     },
 
-    twitterSignIn({ commit }) {
-      commit("setStatus", "loading");
-      var provider = new firebase.auth.TwitterAuthProvider();
-      firebase
-        .auth()
-        .signInWithPopup(provider)
-        .then(function(result) {
-          if (result.user) {
-            commit("setUser", result.user);
-            commit("setStatus", "success");
-            commit("setError", null);
-            router.push("dashboad");
-          } else {
-            commit("setStatus", "failure");
-          }
-        })
-        .catch(function(error) {
-          // var errorCode = error.code;
-          // var errorMessage = error.message;
-          // var email = error.email;
-          // var credential = error.credential;
-          commit("setStatus", "failure");
-          commit("setError", error.message);
-        });
-    },
-
     facebookSignIn({ commit }) {
       commit("setStatus", "loading");
       var provider = new firebase.auth.FacebookAuthProvider();
