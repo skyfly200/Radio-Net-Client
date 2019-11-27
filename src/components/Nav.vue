@@ -41,9 +41,7 @@
     </v-navigation-drawer>
     <v-app-bar app dense dark>
       <v-app-bar-nav-icon @click="openDrawer"></v-app-bar-nav-icon>
-      <v-btn text style="cursor: pointer" to="/">
-        Radio Net
-      </v-btn>
+      <v-btn text style="cursor: pointer" to="/">Radio Net</v-btn>
       <v-spacer></v-spacer>
       <!-- sign out button -->
       <v-btn text v-if="userLogedIn" @click="signout" class="hidden-xs-only">
@@ -62,6 +60,20 @@
         <v-icon class="mr-2" right>{{ item.icon }}</v-icon>
         <span>{{ item.title }}</span>
       </v-btn>
+      <template v-slot:extension>
+        <audio ref="stream" src="//65.183.82.82:8000/KWHR">
+          Your browser does not support the
+          <code>audio</code> element.
+        </audio>
+        <v-btn icon @click="toggleStream">
+          <v-icon>{{ streamState ? "mdi-stop" : "mdi-play" }}</v-icon>
+        </v-btn>
+        <span>{{ trackInfo }}</span>
+        <v-btn icon @click="mute">
+          <v-icon>{{ (volume === 0) ? "mdi-volume-high" : "mdi-volume-off" }}</v-icon>
+        </v-btn>
+        <v-slider class="mt-5" v-model="volume"></v-slider>
+      </template>
     </v-app-bar>
   </div>
 </template>
@@ -69,8 +81,17 @@
 export default {
   data: function() {
     return {
-      drawer: false
+      drawer: false,
+      streamState: false,
+      trackInfo: "",
+      volume: 100,
+      volumeHold: 100
     };
+  },
+  watch: {
+    volume: function() {
+      this.$refs.stream.volume = this.volume / 100.0;
+    }
   },
   computed: {
     userLogedIn() {
@@ -93,6 +114,25 @@ export default {
     }
   },
   methods: {
+    getInfo() {
+      this.trackInfo = "";
+      // axios fetch sream servers json data from url
+      // http://65.183.82.82:8000/status-json.xsl
+      // set alternating text from title to server_description on each update time interval
+      // TODO - scroll text if to long for view, set text width to autofill, hide vol slider
+    },
+    mute() {
+      if (this.volume === 0) {
+        this.volume = this.volumeHold;
+      } else {
+        this.volumeHold = this.volume;
+        this.volume = 0;
+      }
+    },
+    toggleStream() {
+      this.streamState ? this.$refs.stream.pause() : this.$refs.stream.play();
+      this.streamState = !this.streamState;
+    },
     openDrawer() {
       this.drawer = true;
     },
