@@ -48,7 +48,6 @@ export default Vue.extend({
           } else {
             var message = change.doc.data();
             t.messages.push(message);
-            //displayMessage(change.doc.id, message.timestamp, message.name, message.text, message.profilePicUrl, message.imageUrl);
           }
         });
       });

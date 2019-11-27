@@ -58,7 +58,7 @@
         :to="item.link"
       >
         <v-icon class="mr-2" right>{{ item.icon }}</v-icon>
-        <span>{{ item.title }}</span>
+        <span id="stream-info">{{ item.title }}</span>
       </v-btn>
       <template v-slot:extension>
         <audio ref="stream" src="//65.183.82.82:8000/KWHR">
@@ -68,25 +68,43 @@
         <v-btn icon @click="toggleStream">
           <v-icon>{{ streamState ? "mdi-stop" : "mdi-play" }}</v-icon>
         </v-btn>
-        <span>{{ trackInfo }}</span>
-        <v-btn icon @click="mute">
-          <v-icon>{{ (volume === 0) ? "mdi-volume-high" : "mdi-volume-off" }}</v-icon>
-        </v-btn>
-        <v-slider class="mt-5" v-model="volume"></v-slider>
+        <span>{{ trackInfo[infoDisplay] }}</span>
+        <v-spacer />
+        <v-hover v-slot:default="{ hover }" close-delay="500">
+          <div class="volume-controls">
+            <v-btn icon @click="mute">
+              <v-icon>{{
+                volume === 0 ? "mdi-volume-high" : "mdi-volume-off"
+              }}</v-icon>
+            </v-btn>
+            <v-expand-x-transition>
+              <v-slider
+                v-if="hover"
+                id="stream-volume"
+                v-model="volume"
+              ></v-slider>
+            </v-expand-x-transition>
+          </div>
+        </v-hover>
       </template>
     </v-app-bar>
   </div>
 </template>
 <script>
+import firebase from "firebase";
 export default {
   data: function() {
     return {
       drawer: false,
       streamState: false,
       trackInfo: "",
+      infoDisplay: "title",
       volume: 100,
       volumeHold: 100
     };
+  },
+  created() {
+    this.getInfo();
   },
   watch: {
     volume: function() {
@@ -115,11 +133,17 @@ export default {
   },
   methods: {
     getInfo() {
-      this.trackInfo = "";
-      // axios fetch sream servers json data from url
-      // http://65.183.82.82:8000/status-json.xsl
+      // get new info on datastore update (see chat message fetch)
       // set alternating text from title to server_description on each update time interval
       // TODO - scroll text if to long for view, set text width to autofill, hide vol slider
+      var query = firebase
+        .firestore()
+        .collection("streams")
+        .doc("wayhigh");
+      var t = this;
+      query.onSnapshot(function(snapshot) {
+        t.trackInfo = snapshot.data();
+      });
     },
     mute() {
       if (this.volume === 0) {
@@ -142,3 +166,14 @@ export default {
   }
 };
 </script>
+
+<style lang="sass">
+#stream-info
+  flex: 1
+.volume-controls
+  display: flex
+  .v-slider
+    width: 150px
+    margin-top: 7px
+#stream-volume
+</style>
