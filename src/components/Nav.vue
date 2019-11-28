@@ -61,13 +61,14 @@
         <span id="stream-info">{{ item.title }}</span>
       </v-btn>
       <template v-slot:extension>
-        <audio ref="stream" src="//65.183.82.82:8000/KWHR">
+        <audio ref="stream" :src="streams[selectedStream].url">
           Your browser does not support the
           <code>audio</code> element.
         </audio>
         <v-btn icon @click="toggleStream">
           <v-icon>{{ streamState ? "mdi-stop" : "mdi-play" }}</v-icon>
         </v-btn>
+        <v-progress-circular v-if="streamLoading" indeterminate></v-progress-circular>
         <marquee behavior="scroll" direction="left">{{ caption }}</marquee>
         <v-spacer />
         <v-hover v-slot:default="{ hover }" close-delay="500">
@@ -97,16 +98,47 @@ export default {
     return {
       drawer: false,
       streamState: false,
+      streamLoading: false,
       trackInfo: "",
       infoIndex: 0,
       caption: "",
       volume: 100,
-      volumeHold: 100
+      volumeHold: 100,
+      selectedStream: 0,
+      streams: [
+        {title: "Way High Radio", url: "//65.183.82.82:8000/KWHR"}
+      ]
     };
   },
   created() {
     this.streamInfoSync();
     var intervalID = window.setInterval(this.nextInfo, 5000);
+  },
+  mounted() {
+    this.$refs.stream.onplay = function () {
+      this.streamLoading = false;
+    };
+    this.$refs.stream.onplaying = function () {
+      this.streamLoading = false;
+    };
+    this.$refs.stream.onsuspend = function () {
+      this.streamLoading = false;
+    };
+    this.$refs.stream.onended = function () {
+      this.streamLoading = false;
+    };
+    this.$refs.stream.onerror = function () {
+      this.streamLoading = false;
+    };
+    this.$refs.stream.onloadstart = function () {
+      this.streamLoading = true;
+    };
+    this.$refs.stream.onstalled = function () {
+      this.streamLoading = true;
+    };
+    this.$refs.stream.onwaiting = function () {
+      this.streamLoading = true;
+    };
   },
   watch: {
     volume: function() {
