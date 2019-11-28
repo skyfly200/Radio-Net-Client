@@ -1,7 +1,5 @@
 <template lang="pug">
   div
-    p Chat
-    v-divider
     v-list(three-line)
       v-list-item(v-for="m in messages")
         v-list-item-content
