@@ -68,7 +68,7 @@
         <v-btn icon @click="toggleStream">
           <v-icon>{{ streamState ? "mdi-stop" : "mdi-play" }}</v-icon>
         </v-btn>
-        <span>{{ trackInfo[infoDisplay] }}</span>
+        <marquee behavior="scroll" direction="left">{{ caption }}</marquee>
         <v-spacer />
         <v-hover v-slot:default="{ hover }" close-delay="500">
           <div class="volume-controls">
@@ -98,13 +98,15 @@ export default {
       drawer: false,
       streamState: false,
       trackInfo: "",
-      infoDisplay: "title",
+      infoIndex: 0,
+      caption: "",
       volume: 100,
       volumeHold: 100
     };
   },
   created() {
-    this.getInfo();
+    this.streamInfoSync();
+    var intervalID = window.setInterval(this.nextInfo, 5000);
   },
   watch: {
     volume: function() {
@@ -132,10 +134,13 @@ export default {
     }
   },
   methods: {
-    getInfo() {
-      // get new info on datastore update (see chat message fetch)
-      // set alternating text from title to server_description on each update time interval
-      // TODO - scroll text if to long for view, set text width to autofill, hide vol slider
+    nextInfo() {
+      let keys = ["title", "description", "listeners"];
+      let labels = ["", "", " Listeners"];
+      this.caption = this.trackInfo[keys[this.infoIndex]] + labels[this.infoIndex];
+      this.infoIndex = (this.infoIndex + 1) % 3;
+    },
+    streamInfoSync() {
       var query = firebase
         .firestore()
         .collection("streams")
@@ -175,5 +180,4 @@ export default {
   .v-slider
     width: 150px
     margin-top: 7px
-#stream-volume
 </style>
