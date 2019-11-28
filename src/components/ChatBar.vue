@@ -24,32 +24,27 @@
         <v-menu
           top
           offset-y
-          allow-overflow
           v-model="menu"
           transition="scale-transition"
           :close-on-click="false"
           :close-on-content-click="false"
-          max-height="50vh"
-          max-width="300px"
         >
           <template v-slot:activator="{ on }">
             <v-btn v-on="on" @click.stop.prevent text>
               <span>Public</span>
             </v-btn>
           </template>
-          <v-sheet class="pb-3">
-            <v-toolbar>
+          <v-sheet class="chat-window pb-3" height="50vh" width="300px">
+            <v-toolbar dense tile>
               <h3>Chat</h3>
               <v-spacer />
               <v-btn @click="menu = false" right icon small>
                 <v-icon>mdi-close</v-icon>
               </v-btn>
             </v-toolbar>
-            <v-divider />
             <Chat />
           </v-sheet>
         </v-menu>
-        <v-spacer />
         <v-btn @click="showChatBar = !showChatBar" text small>
           <v-icon>mdi-chevron-down</v-icon>
         </v-btn>
@@ -71,3 +66,7 @@ export default {
   }
 };
 </script>
+<style lang="sass" scoped>
+.chat-window
+  overflow-y: hidden
+</style>

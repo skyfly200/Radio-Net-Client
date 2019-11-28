@@ -1,16 +1,17 @@
 <template lang="pug">
-  div
-    v-list(three-line)
-      v-list-item(v-for="m in messages")
-        v-list-item-content
-          v-list-item-title {{ m.name }}
-          p {{ m.text }}
-          p {{ Date(m.timestamp) }}
-        v-list-item-avatar
-          v-img(:src="m.profilePicUrl")
+  .chat
+    .messages
+      v-list(three-line)
+        v-list-item(v-for="m in messages")
+          v-list-item-content
+            v-list-item-title {{ m.name }}
+            p {{ m.text }}
+            p {{ Date(m.timestamp) }}
+          v-list-item-avatar
+            v-img(:src="m.profilePicUrl")
     .input
-      v-textarea(v-model="message")
-      v-btn(icon @click="send")
+      v-textarea(auto-grow solo hide-details single-line rows="1" v-model="message")
+      v-btn(icon @click="send" class="pt-3")
         v-icon mdi-send
 </template>
 
@@ -34,7 +35,7 @@ export default Vue.extend({
       var query = firebase
         .firestore()
         .collection("messages")
-        .orderBy("timestamp", "desc")
+        .orderBy("timestamp", "asc")
         .limit(12);
 
       let t = this;
@@ -82,7 +83,12 @@ export default Vue.extend({
 </script>
 
 <style lang="sass" scoped>
+.chat
+.messages
+  height: 35vh
+  overflow-y: scroll
 .input
+  flex: 1
   display: flex
   flex-direction: horizontal
 </style>
