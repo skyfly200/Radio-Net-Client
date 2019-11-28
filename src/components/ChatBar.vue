@@ -22,9 +22,11 @@
         </v-btn>
         <v-spacer />
         <v-menu
+          v-model="menu"
           top
           offset-y
-          v-model="menu"
+          nudge-top="6"
+          origin="bottom center"
           transition="scale-transition"
           :close-on-click="false"
           :close-on-content-click="false"
@@ -35,13 +37,14 @@
             </v-btn>
           </template>
           <v-sheet class="chat-window pb-3" height="50vh" width="300px">
-            <v-toolbar dense tile>
+            <v-toolbar dense flat>
               <h3>Chat</h3>
               <v-spacer />
               <v-btn @click="menu = false" right icon small>
                 <v-icon>mdi-close</v-icon>
               </v-btn>
             </v-toolbar>
+            <v-divider />
             <Chat />
           </v-sheet>
         </v-menu>
@@ -60,7 +63,7 @@ export default {
   },
   data() {
     return {
-      showChatBar: true,
+      showChatBar: false,
       menu: false
     };
   }

@@ -1,12 +1,12 @@
 <template lang="pug">
   .chat
-    .messages
+    .messages(id="messages" v-chat-scroll="{always: false, smooth: true, scrollonremoved:true, smoothonremoved: false}")
       v-list(three-line)
         v-list-item(v-for="m in messages")
           v-list-item-content
             v-list-item-title {{ m.name }}
             p {{ m.text }}
-            p {{ Date(m.timestamp) }}
+            p {{ m.timestamp }}
           v-list-item-avatar
             v-img(:src="m.profilePicUrl")
     .input
@@ -35,7 +35,7 @@ export default Vue.extend({
       var query = firebase
         .firestore()
         .collection("messages")
-        .orderBy("timestamp", "asc")
+        .orderBy("timestamp")
         .limit(12);
 
       let t = this;
