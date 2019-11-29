@@ -171,11 +171,9 @@ export default {
   },
   methods: {
     nextInfo() {
-      let keys = ["title", "description", "listeners"];
-      let labels = ["", "", " Listeners"];
-      this.caption =
-        this.trackInfo[keys[this.infoIndex]] + labels[this.infoIndex];
-      this.infoIndex = (this.infoIndex + 1) % 3;
+      let keys = ["title", "description"];
+      this.caption = this.trackInfo[keys[this.infoIndex]];
+      this.infoIndex = (this.infoIndex + 1) % 2;
     },
     streamInfoSync() {
       var query = firebase
