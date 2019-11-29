@@ -2,7 +2,7 @@
   <div>
     <v-navigation-drawer v-model="drawer" app>
       <v-list dense>
-        <v-list-item link on="/">
+        <v-list-item link to="/">
           <v-list-item-action>
             <v-icon>mdi-home</v-icon>
           </v-list-item-action>
@@ -10,7 +10,7 @@
             <v-list-item-title>Home</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item link on="/about">
+        <v-list-item link to="/about">
           <v-list-item-action>
             <v-icon>mdi-information</v-icon>
           </v-list-item-action>
@@ -20,12 +20,20 @@
         </v-list-item>
         <template v-if="userLogedIn">
           <v-divider></v-divider>
-          <v-list-item link on="/dashboard">
+          <v-list-item link to="/dashboard">
             <v-list-item-action>
               <v-icon>mdi-account</v-icon>
             </v-list-item-action>
             <v-list-item-content>
               <v-list-item-title>Dashboard</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item link to="/share">
+            <v-list-item-action>
+              <v-icon>mdi-file-cloud</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>Content</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
           <v-list-item link @click="signout">
@@ -74,16 +82,14 @@
         <v-hover v-slot:default="{ hover }" close-delay="500">
           <div class="volume-controls">
             <v-btn icon @click="mute">
-              <v-icon>{{
+              <v-icon>
+                {{
                 volume === 0 ? "mdi-volume-high" : "mdi-volume-off"
-              }}</v-icon>
+                }}
+              </v-icon>
             </v-btn>
             <v-expand-x-transition>
-              <v-slider
-                v-if="hover"
-                id="stream-volume"
-                v-model="volume"
-              ></v-slider>
+              <v-slider v-if="hover" id="stream-volume" v-model="volume"></v-slider>
             </v-expand-x-transition>
           </div>
         </v-hover>
@@ -105,9 +111,7 @@ export default {
       volume: 100,
       volumeHold: 100,
       selectedStream: 0,
-      streams: [
-        {title: "Way High Radio", url: "//65.183.82.82:8000/KWHR"}
-      ]
+      streams: [{ title: "Way High Radio", url: "//65.183.82.82:8000/KWHR" }]
     };
   },
   created() {
@@ -115,28 +119,28 @@ export default {
     var intervalID = window.setInterval(this.nextInfo, 5000);
   },
   mounted() {
-    this.$refs.stream.onplay = function () {
+    this.$refs.stream.onplay = function() {
       this.streamLoading = false;
     };
-    this.$refs.stream.onplaying = function () {
+    this.$refs.stream.onplaying = function() {
       this.streamLoading = false;
     };
-    this.$refs.stream.onsuspend = function () {
+    this.$refs.stream.onsuspend = function() {
       this.streamLoading = false;
     };
-    this.$refs.stream.onended = function () {
+    this.$refs.stream.onended = function() {
       this.streamLoading = false;
     };
-    this.$refs.stream.onerror = function () {
+    this.$refs.stream.onerror = function() {
       this.streamLoading = false;
     };
-    this.$refs.stream.onloadstart = function () {
+    this.$refs.stream.onloadstart = function() {
       this.streamLoading = true;
     };
-    this.$refs.stream.onstalled = function () {
+    this.$refs.stream.onstalled = function() {
       this.streamLoading = true;
     };
-    this.$refs.stream.onwaiting = function () {
+    this.$refs.stream.onwaiting = function() {
       this.streamLoading = true;
     };
   },
@@ -169,7 +173,8 @@ export default {
     nextInfo() {
       let keys = ["title", "description", "listeners"];
       let labels = ["", "", " Listeners"];
-      this.caption = this.trackInfo[keys[this.infoIndex]] + labels[this.infoIndex];
+      this.caption =
+        this.trackInfo[keys[this.infoIndex]] + labels[this.infoIndex];
       this.infoIndex = (this.infoIndex + 1) % 3;
     },
     streamInfoSync() {

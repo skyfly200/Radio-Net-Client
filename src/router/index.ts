@@ -37,6 +37,12 @@ const routes = [
       import(/* webpackChunkName: "dashboard" */ "../views/Dashboard.vue")
   },
   {
+    path: "/share",
+    name: "share",
+    component: () =>
+      import(/* webpackChunkName: "share" */ "../views/Share.vue")
+  },
+  {
     path: "/*",
     name: "Error404",
     component: () =>

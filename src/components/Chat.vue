@@ -19,6 +19,9 @@
 import Vue from "vue";
 import firebase from "firebase";
 export default Vue.extend({
+  props: {
+    id: String
+  },
   data: function() {
     return {
       message: "",
@@ -34,6 +37,8 @@ export default Vue.extend({
       // Create the query to load the last 12 messages and listen for new ones.
       var query = firebase
         .firestore()
+        .collection("chats")
+        .doc(this.id)
         .collection("messages")
         .orderBy("timestamp")
         .limit(12);
@@ -72,6 +77,8 @@ export default Vue.extend({
       this.message = "";
       return firebase
         .firestore()
+        .collection("chats")
+        .doc(this.id)
         .collection("messages")
         .add(newMessage)
         .catch(function(error) {
