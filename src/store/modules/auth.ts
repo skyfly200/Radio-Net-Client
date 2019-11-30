@@ -71,55 +71,6 @@ export default class Auth extends VuexModule {
       });
   }
 
-  @MutationAction({ mutate: ["status", "user", "error"] })
-  async googleSignIn() {
-    //this.context.commit("setStatus", "loading");
-    var provider = new firebase.auth.GoogleAuthProvider();
-    await firebase
-      .auth()
-      .signInWithPopup(provider)
-      .then(function(result) {
-        if (result.user) {
-          router.push("dashboard");
-          return { status: "success", user: result.user, error: null };
-        } else {
-          return { status: "failure", user: null, error: "" };
-        }
-      })
-      .catch(function(error) {
-        return { status: "failure", user: null, error: error.message };
-      });
-  }
-
-  @Action({ rawError: true })
-  async facebookSignIn() {
-    this.context.commit("setStatus", "loading");
-    var provider = new firebase.auth.FacebookAuthProvider();
-    let t = this;
-    await firebase
-      .auth()
-      .signInWithPopup(provider)
-      .then(function(result) {
-        if (result.user) {
-          router.push("dashboard");
-          t.context.commit("setAuth", {
-            status: "success",
-            user: result.user,
-            error: null
-          });
-        } else {
-          t.context.commit("setAuth", {
-            status: "failure",
-            user: null,
-            error: ""
-          });
-        }
-      })
-      .catch(function(error) {
-        return { status: "failure", user: null, error: error.message };
-      });
-  }
-
   @Action({ rawError: true })
   async providerSignIn(p: string) {
     this.context.commit("setStatus", "loading");
@@ -155,27 +106,7 @@ export default class Auth extends VuexModule {
           });
         }
       })
-      .catch(function(error) {
-        return { status: "failure", user: null, error: error.message };
-      });
-  }
-
-  @MutationAction({ mutate: ["status", "user", "error"] })
-  async githubSignIn() {
-    this.context.commit("setStatus", "loading");
-    var provider = new firebase.auth.GithubAuthProvider();
-    firebase
-      .auth()
-      .signInWithPopup(provider)
-      .then(function(result) {
-        if (result.user) {
-          router.push("dashboard");
-          return { status: "success", user: result.user, error: null };
-        } else {
-          return { status: "failure", user: null, error: "" };
-        }
-      })
-      .catch(function(error) {
+      .catch(function(error: any) {
         return { status: "failure", user: null, error: error.message };
       });
   }
