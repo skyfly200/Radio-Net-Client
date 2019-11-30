@@ -51,7 +51,7 @@ export default {
   },
   computed: {
     error() {
-      return this.$store.getters.user;
+      return this.$store.getters.getUser;
     },
     status() {
       return this.$store.getters.status;

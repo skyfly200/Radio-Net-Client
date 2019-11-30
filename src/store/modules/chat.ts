@@ -5,6 +5,7 @@ import {
   Action,
   MutationAction
 } from "vuex-module-decorators";
+import firebase from "firebase";
 
 import { Conversation } from "@/models/conversation";
 import { Contact } from "@/models/contact";

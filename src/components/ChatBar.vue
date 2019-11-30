@@ -72,7 +72,7 @@ export default {
   },
   computed: {
     userLoggedIn() {
-      return this.$store.getters.user;
+      return this.$store.getters.getUser;
     }
   }
 };

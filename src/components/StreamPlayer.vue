@@ -71,7 +71,7 @@ export default {
   },
   computed: {
     userLogedIn() {
-      return this.$store.getters.user;
+      return this.$store.getters.getUser;
     },
     items() {
       let menuItems = [

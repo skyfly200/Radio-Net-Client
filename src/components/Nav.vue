@@ -92,10 +92,10 @@ export default {
   },
   computed: {
     userLogedIn() {
-      return this.$store.getters.user;
+      return this.$store.getters.getUser;
     },
     username() {
-      return this.$store.getters.user.displayName;
+      return this.$store.getters.getUser.displayName;
     }
   },
   methods: {

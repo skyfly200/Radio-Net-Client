@@ -57,7 +57,7 @@ export default Vue.extend({
       });
     },
     send() {
-      let user = this.$store.getters.user;
+      let user = this.$store.getters.getUser;
       let newMessage;
       if (!user) {
         newMessage = {

@@ -50,7 +50,7 @@ import EditableField from "@/components/EditableField.vue";
     user: {}
   }),
   created() {
-    this.user = this.$store.getters.user;
+    this.user = this.$store.getters.getUser;
     if (this.user) {
       this.name = this.user.displayName;
       this.email = this.user.email;
@@ -61,10 +61,10 @@ import EditableField from "@/components/EditableField.vue";
   },
   computed: {
     userLoggedIn() {
-      return this.$store.getters.user;
+      return this.$store.getters.getUser;
     },
     username() {
-      return this.$store.getters.user.displayName;
+      return this.$store.getters.getUser.displayName;
     }
   },
   methods: {

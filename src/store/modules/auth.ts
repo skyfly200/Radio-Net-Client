@@ -6,58 +6,190 @@ import {
   Action
 } from "vuex-module-decorators";
 
+import router from "../../router";
+import firebase from "firebase";
 import { User } from "@/models/user";
 
 @Module
 export default class Auth extends VuexModule {
-  status: string = "";
-  token: string = localStorage.getItem("token") || "";
-  user: User = new User();
+  status: string | null = "";
+  user: User | null = new User();
+  error: string | null = "";
 
-  @MutationAction({ mutate: ["status", "token", "user"] })
-  async load_session() {
-    let token = localStorage.getItem("token");
-    let user = localStorage.getItem("user");
-    if (user != null) user = JSON.parse(user);
-    return { status: "success", token: token, user: user };
+  @Mutation
+  setStatus(status: string | null) {
+    this.status = status;
   }
-  @MutationAction({ mutate: ["status", "token", "user"] }) async login(
-    data: object
-  ) {
-    try {
-      const response: any = {};
-      if (response.data.auth) {
-        const token = response.data.token;
-        const user = response.data.user;
-        // MUST be changed to store JWT in cookie for security!!!
-        localStorage.setItem("token", token);
-        localStorage.setItem("user", JSON.stringify(user));
-        return { status: "success", token: token, user: user };
-      } else {
-        return { status: "failed", token: "", user: {} };
-      }
-    } catch (error) {
-      console.error("error", error);
-      return { status: "error", token: true, user: {} };
+
+  @Mutation
+  setAuth(payload: any) {
+    this.status = payload.status;
+    this.user = payload.user;
+    this.error = payload.error;
+  }
+
+  @MutationAction({ mutate: ["status", "user", "error"] })
+  async signInAction(payload: { email: string; password: string }) {
+    firebase
+      .auth()
+      .signInWithEmailAndPassword(payload.email, payload.password)
+      .then(response => {
+        router.push("dashboard");
+        return { status: "success", user: response.user, error: null };
+      })
+      .catch(error => {
+        return { status: "failure", user: null, error: error.message };
+      });
+  }
+
+  @MutationAction({ mutate: ["status", "user", "error"] })
+  async signOutAction() {
+    firebase
+      .auth()
+      .signOut()
+      .then(response => {
+        router.push("login");
+        return { status: "success", user: null, error: null };
+      })
+      .catch(error => {
+        return { status: "failure", user: null, error: error.message };
+      });
+  }
+
+  @MutationAction({ mutate: ["status", "user", "error"] })
+  async signUpAction(payload: { email: string; password: string }) {
+    this.context.commit("setStatus", "loading");
+    firebase
+      .auth()
+      .createUserWithEmailAndPassword(payload.email, payload.password)
+      .then(response => {
+        router.push("dashboard");
+        return { status: "success", user: response.user, error: null };
+      })
+      .catch(error => {
+        return { status: "failure", user: null, error: error.message };
+      });
+  }
+
+  @MutationAction({ mutate: ["status", "user", "error"] })
+  async googleSignIn() {
+    //this.context.commit("setStatus", "loading");
+    var provider = new firebase.auth.GoogleAuthProvider();
+    await firebase
+      .auth()
+      .signInWithPopup(provider)
+      .then(function(result) {
+        if (result.user) {
+          router.push("dashboard");
+          return { status: "success", user: result.user, error: null };
+        } else {
+          return { status: "failure", user: null, error: "" };
+        }
+      })
+      .catch(function(error) {
+        return { status: "failure", user: null, error: error.message };
+      });
+  }
+
+  @Action({ rawError: true })
+  async facebookSignIn() {
+    this.context.commit("setStatus", "loading");
+    var provider = new firebase.auth.FacebookAuthProvider();
+    let t = this;
+    await firebase
+      .auth()
+      .signInWithPopup(provider)
+      .then(function(result) {
+        if (result.user) {
+          router.push("dashboard");
+          t.context.commit("setAuth", {
+            status: "success",
+            user: result.user,
+            error: null
+          });
+        } else {
+          t.context.commit("setAuth", {
+            status: "failure",
+            user: null,
+            error: ""
+          });
+        }
+      })
+      .catch(function(error) {
+        return { status: "failure", user: null, error: error.message };
+      });
+  }
+
+  @Action({ rawError: true })
+  async providerSignIn(p: string) {
+    this.context.commit("setStatus", "loading");
+    var provider;
+    switch (p) {
+      case "fb":
+        provider = new firebase.auth.FacebookAuthProvider();
+        break;
+      case "go":
+        provider = new firebase.auth.GoogleAuthProvider();
+        break;
+      case "gh":
+        provider = new firebase.auth.GithubAuthProvider();
+        break;
     }
-  }
-  @MutationAction({ mutate: ["status", "token", "user"] }) async logout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    return { status: "", token: "", user: {} };
+    let t = this;
+    await firebase
+      .auth()
+      .signInWithPopup(provider)
+      .then(function(result) {
+        if (result.user) {
+          router.push("dashboard");
+          t.context.commit("setAuth", {
+            status: "success",
+            user: result.user,
+            error: null
+          });
+        } else {
+          t.context.commit("setAuth", {
+            status: "failure",
+            user: null,
+            error: ""
+          });
+        }
+      })
+      .catch(function(error) {
+        return { status: "failure", user: null, error: error.message };
+      });
   }
 
-  @Action register(data: object) {
-    return;
+  @MutationAction({ mutate: ["status", "user", "error"] })
+  async githubSignIn() {
+    this.context.commit("setStatus", "loading");
+    var provider = new firebase.auth.GithubAuthProvider();
+    firebase
+      .auth()
+      .signInWithPopup(provider)
+      .then(function(result) {
+        if (result.user) {
+          router.push("dashboard");
+          return { status: "success", user: result.user, error: null };
+        } else {
+          return { status: "failure", user: null, error: "" };
+        }
+      })
+      .catch(function(error) {
+        return { status: "failure", user: null, error: error.message };
+      });
   }
 
   get isLoggedIn() {
-    return !!this.token;
-  }
-  get authStatus() {
-    return this.status;
+    return !!this.user;
   }
   get getUser() {
     return this.user;
+  }
+  get getStatus() {
+    return this.status;
+  }
+  get getError() {
+    return this.error;
   }
 }
