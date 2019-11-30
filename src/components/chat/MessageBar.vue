@@ -25,23 +25,23 @@
         v-list(dense)
           v-list-tile(@click="menu = 'search'")
             v-list-tile-action
-              v-icon search
+              v-icon mdi-search
             v-list-tile-title Search Conversation
           v-list-tile(v-if="isMulti" @click="menu = 'title'")
             v-list-tile-action
-              v-icon title
+              v-icon mdi-title
             v-list-tile-title Rename Conversation
           v-list-tile(v-if="isMulti && isOwner" @click="menu = 'recipients'")
             v-list-tile-action
-              v-icon person_add
+              v-icon mdi-account-plus
             v-list-tile-title Edit Recipients
           v-list-tile(v-if="isMulti" @click="$emit('leave', conversation.id)")
             v-list-tile-action
-              v-icon remove_circle
+              v-icon mdi-minus-circle
             v-list-tile-title Leave Conversation
           v-list-tile(@click="$emit('delete', conversation.id)")
             v-list-tile-action
-              v-icon delete
+              v-icon mdi-delete
             v-list-tile-title Delete Conversation
           v-list-tile(@click="$emit('pane', 'notifications')")
             v-list-tile-action
@@ -85,27 +85,35 @@ import UserSelector from "@/components/chat/UserSelector.vue";
     },
     isRecipients: function() {
       return this.conversation.members.length > 1;
-    },
+    }
   },
   methods: {
     updateTitle: function() {
       this.menu = "";
-      this.$emit('updateTitle', this.title);
+      this.$emit("updateTitle", this.title);
       this.title = "";
     },
     updateRecipients: function(recipients) {
       this.menu = "";
-      this.$emit('updateRecipients', recipients);
+      this.$emit("updateRecipients", recipients);
     },
     getOthers: function(members) {
-      return members ? members.filter( (m) => (m.username !== this.username)) : [];
+      return members ? members.filter(m => m.username !== this.username) : [];
     },
     autoTitle: function(c) {
-      let auto = this.getOthers(c.members).map(m => (this.titleCase(m.username))).join(', ');
-      return c.title ? c.title : (c.members.length > 1 ? (c.messages.length > 0 ? auto : "New Message to " + auto) : "New Message");
+      let auto = this.getOthers(c.members)
+        .map(m => this.titleCase(m.username))
+        .join(", ");
+      return c.title
+        ? c.title
+        : c.members.length > 1
+        ? c.messages.length > 0
+          ? auto
+          : "New Message to " + auto
+        : "New Message";
     },
     titleCase: function(string) {
-      return (string ? string.charAt(0).toUpperCase() + string.slice(1) : "");
+      return string ? string.charAt(0).toUpperCase() + string.slice(1) : "";
     }
   }
 })

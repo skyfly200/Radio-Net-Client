@@ -1,9 +1,9 @@
 <template lang="pug">
   v-toolbar.convo-toolbar(flat dense)
     v-text-field.search-field(flat full-width hide-details single-line clearable name="search" v-model="query" @input="$emit('query', query)" label="Search"
-      prepend-inner-icon="search"
-      append-icon="filter_list"
-      append-outer-icon="add_circle"
+      prepend-inner-icon="mdi-magnify"
+      append-icon="mdi-filter"
+      append-outer-icon="mdi-plus-circle"
       @click:append="$emit('filter')"
       @click:append-outer="$emit('new')")
 </template>
@@ -15,7 +15,7 @@ import { Component, Vue } from "vue-property-decorator";
   data: function() {
     return {
       query: ""
-    }
+    };
   }
 })
 export default class SearchBar extends Vue {}
