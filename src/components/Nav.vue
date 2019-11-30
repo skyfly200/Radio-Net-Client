@@ -2,10 +2,10 @@
   div
     v-navigation-drawer(app v-model="drawer")
       v-list.pa1
-        template(avatar v-if='userLogedIn')
+        template(avatar v-if='userLoggedIn')
           v-list-item
             v-list-item-avatar
-              v-img(:src="userLogedIn.photoURL")
+              v-img(:src="user.photoURL")
             v-list-item-content
               .welcome
                 span Welcome&nbsp;
@@ -38,7 +38,7 @@
             v-icon mdi-information
           v-list-item-content
             v-list-item-title About
-        template(v-if='userLogedIn')
+        template(v-if='userLoggedIn')
           v-list-item(to='/dashboard')
             v-list-item-action
               v-icon mdi-account
@@ -64,9 +64,9 @@
       v-btn(text style="cursor: pointer" to="/") Radio Net
       v-spacer
       #user
-        template(v-if='userLogedIn')
+        template(v-if='userLoggedIn')
           .user-img
-            v-img(:src="userLogedIn.photoURL" width="40")
+            v-img(:src="user.photoURL" width="40")
           .controls.pt-3
             .welcome
               span Welcome&nbsp;
@@ -91,7 +91,10 @@ export default {
     };
   },
   computed: {
-    userLogedIn() {
+    userLoggedIn() {
+      return this.$store.getters.isLoggedIn;
+    },
+    user() {
       return this.$store.getters.getUser;
     },
     username() {

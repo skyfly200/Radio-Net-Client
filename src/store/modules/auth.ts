@@ -12,9 +12,10 @@ import { User } from "@/models/user";
 
 @Module
 export default class Auth extends VuexModule {
-  status: string | null = "";
+  status: string | null = null;
+  raw: object | null = null;
   user: User | null = new User();
-  error: string | null = "";
+  error: string | null = null;
 
   @Mutation
   setStatus(status: string | null) {
@@ -24,50 +25,78 @@ export default class Auth extends VuexModule {
   @Mutation
   setAuth(payload: any) {
     this.status = payload.status;
-    this.user = payload.user;
+    this.raw = payload.user;
     this.error = payload.error;
   }
 
-  @MutationAction({ mutate: ["status", "user", "error"] })
+  @Action
   async signInAction(payload: { email: string; password: string }) {
-    firebase
+    let t = this;
+    await firebase
       .auth()
       .signInWithEmailAndPassword(payload.email, payload.password)
       .then(response => {
         router.push("dashboard");
-        return { status: "success", user: response.user, error: null };
+        t.context.commit("setAuth", {
+          status: "success",
+          user: response.user,
+          error: null
+        });
       })
       .catch(error => {
-        return { status: "failure", user: null, error: error.message };
+        t.context.commit("setAuth", {
+          status: "failure",
+          user: null,
+          error: error.message
+        });
       });
   }
 
-  @MutationAction({ mutate: ["status", "user", "error"] })
+  @Action
   async signOutAction() {
-    firebase
+    this.context.commit("setStatus", "loading");
+    let t = this;
+    await firebase
       .auth()
       .signOut()
       .then(response => {
         router.push("login");
-        return { status: "success", user: null, error: null };
+        t.context.commit("setAuth", {
+          status: "success",
+          user: null,
+          error: null
+        });
       })
       .catch(error => {
-        return { status: "failure", user: null, error: error.message };
+        t.context.commit("setAuth", {
+          status: "failure",
+          user: null,
+          error: error.message
+        });
       });
   }
 
-  @MutationAction({ mutate: ["status", "user", "error"] })
+  @Action
   async signUpAction(payload: { email: string; password: string }) {
     this.context.commit("setStatus", "loading");
+    let t = this;
     firebase
       .auth()
       .createUserWithEmailAndPassword(payload.email, payload.password)
       .then(response => {
         router.push("dashboard");
-        return { status: "success", user: response.user, error: null };
+        t.context.commit("setAuth", {
+          status: "success",
+          user: response.user,
+          error: null
+        });
       })
       .catch(error => {
-        return { status: "failure", user: null, error: error.message };
+        t.context.commit("setAuth", {
+          status: "failure",
+          user: null,
+          error: error.message
+        });
       });
   }
 
@@ -112,10 +141,10 @@ export default class Auth extends VuexModule {
   }
 
   get isLoggedIn() {
-    return !!this.user;
+    return !!this.raw;
   }
   get getUser() {
-    return this.user;
+    return this.raw;
   }
   get getStatus() {
     return this.status;
