@@ -10,6 +10,11 @@ import VueChatScroll from "vue-chat-scroll";
 Vue.use(VueChatScroll);
 Vue.config.productionTip = false;
 
+Vue.filter("capitalize", function(value: string) {
+  if (!value) return "";
+  return value.charAt(0).toUpperCase() + value.slice(1);
+});
+
 var config = {
   apiKey: process.env.VUE_APP_FIREBASE_API_KEY,
   authDomain: process.env.VUE_APP_FIREBASE_AUTH_DOMAIN,
