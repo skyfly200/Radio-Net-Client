@@ -4,8 +4,8 @@
     :items="contacts"
     item-text="username"
     item-value="username"
-    prepend-icon="contacts"
-    append-outer-icon="check"
+    prepend-icon="mdi-contacts"
+    append-outer-icon="mdi-check"
     @click:append-outer="$emit('done', members)")
     template(v-slot:selection='data')
       v-chip.chip--select-multi(:selected='data.selected' close @input='removeRecipient(data.item)')
@@ -26,11 +26,11 @@ import { Component, Vue } from "vue-property-decorator";
   data: function() {
     return {
       members: this.previous
-    }
+    };
   },
   methods: {
     removeRecipient: function(user) {
-      const index = this.members.findIndex( (m) => (m.username === user.username) );
+      const index = this.members.findIndex(m => m.username === user.username);
       if (index >= 0) this.members.splice(index, 1);
     }
   }

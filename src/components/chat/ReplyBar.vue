@@ -20,7 +20,7 @@
         v-flex(xs9)
           v-card-actions
             v-spacer
-            v-icon(small @click.prevent="clearPreview") close
+            v-icon(small @click.prevent="clearPreview") mdi-close
           v-card-title
             .link-title {{ preview.title }}
             .description {{ preview.description }}

@@ -5,14 +5,14 @@
     template(v-else-if="menu === 'search'")
       v-text-field.search(name="search" label="Search Conversation" single-line full-width hide-details clearable
         v-model="query"
-        prepend-icon="search"
-        append-outer-icon="check"
+        prepend-icon="mdi-magnify"
+        append-outer-icon="mdi-check"
         @click:append-outer="menu = ''")
     template(v-else-if="menu === 'title'")
       v-text-field.title-edit(name="title" label="Conversation Title" single-line full-width hide-details
         v-model="title"
-        prepend-icon="title"
-        append-outer-icon="check"
+        prepend-icon="mdi-format-title"
+        append-outer-icon="mdi-check"
         @click:append-outer="updateTitle")
     template(v-else)
       v-spacer
@@ -21,15 +21,15 @@
       v-menu(bottom left)
         template(v-slot:activator="{ on }")
           v-btn(icon v-on="on")
-            v-icon more_vert
+            v-icon mdi-dots-vertical
         v-list(dense)
           v-list-tile(@click="menu = 'search'")
             v-list-tile-action
-              v-icon mdi-search
+              v-icon mdi-magnify
             v-list-tile-title Search Conversation
           v-list-tile(v-if="isMulti" @click="menu = 'title'")
             v-list-tile-action
-              v-icon mdi-title
+              v-icon mdi-format-title
             v-list-tile-title Rename Conversation
           v-list-tile(v-if="isMulti && isOwner" @click="menu = 'recipients'")
             v-list-tile-action
@@ -45,15 +45,15 @@
             v-list-tile-title Delete Conversation
           v-list-tile(@click="$emit('pane', 'notifications')")
             v-list-tile-action
-              v-icon notifications_off
+              v-icon mdi-bell-off
             v-list-tile-title Mute Notifications
           v-list-tile(@click="$emit('pane', 'style')")
             v-list-tile-action
-              v-icon color_lens
+              v-icon mdi-palette
             v-list-tile-title Set Conversation Styles
           v-list-tile(@click="$emit('pane', 'info')")
             v-list-tile-action
-              v-icon info
+              v-icon mdi-information
             v-list-tile-title Info
 </template>
 <script>

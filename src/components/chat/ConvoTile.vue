@@ -1,17 +1,17 @@
 <template lang="pug">
-v-list-tile.conversation(@click="$emit('select')")
-  v-list-tile-avatar
+v-list-item.conversation(@click="$emit('select')")
+  v-list-item-avatar
     v-img(v-if="c.members.length > 1" :src="selectConvoAvatar(c)")
-    v-icon(v-else large) person
-  v-list-tile-content(:class="{ unread: c.unread }")
-    v-list-tile-title
+    v-icon(v-else large) mdi-account
+  v-list-item-content(:class="{ unread: c.unread }")
+    v-list-item-title
       h5
         span {{ autoTitle(c) }}
-    v-list-tile-sub-title
+    v-list-item-sub-title
       span(v-if="c.messages.length").message-body {{ c.messages[c.messages.length - 1].body }}
-  v-list-tile-action
+  v-list-item-action
     v-btn(v-if="!c.messages.length" icon flat @click="$emit('delete')")
-      v-icon close
+      v-icon mdi-close
     span(v-else).timestamp {{ formatTimestamp(c.messages[c.messages.length - 1].timestamp) }}
 </template>
 <script>
