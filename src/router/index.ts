@@ -37,8 +37,28 @@ const routes = [
       import(/* webpackChunkName: "dashboard" */ "../views/Dashboard.vue")
   },
   {
+    path: "/admin",
+    name: "admin",
+    meta: { requiresAuth: true },
+    component: () =>
+      import(/* webpackChunkName: "admin" */ "../views/Admin.vue")
+  },
+  {
+    path: "/root",
+    name: "root",
+    meta: { requiresAuth: true },
+    component: () => import(/* webpackChunkName: "root" */ "../views/Root.vue")
+  },
+  {
+    path: "/chat",
+    name: "chat",
+    meta: { requiresAuth: true },
+    component: () => import(/* webpackChunkName: "chat" */ "../views/Chat.vue")
+  },
+  {
     path: "/share",
     name: "share",
+    meta: { requiresAuth: true },
     component: () =>
       import(/* webpackChunkName: "share" */ "../views/Share.vue")
   },
