@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "core-js": "^3.3.2",
+    "date-fns": "^2.8.1",
+    "emoji-mart-vue": "^2.6.6",
     "firebase": "^7.4.0",
     "firebaseui": "^4.3.0",
     "register-service-worker": "^1.6.2",

@@ -19,20 +19,20 @@ import { Component, Vue } from "vue-property-decorator";
 import ConversationIndex from "@/components/chat/ConversationIndex.vue";
 import ConversationView from "@/components/chat/ConversationView.vue";
 // import date-fns utils
-const isToday = require('date-fns/is_today');
-const isThisWeek = require('date-fns/is_this_week');
-const isThisYear = require('date-fns/is_this_year');
-const getTime = require('date-fns/get_time');
-const format = require('date-fns/format');
+// const isToday = require("date-fns/is_today");
+// const isThisWeek = require("date-fns/is_this_week");
+// const isThisYear = require("date-fns/is_this_year");
+// const getTime = require("date-fns/get_time");
+const format = require("date-fns/format");
 // vuex stuff
 import { mapGetters } from "vuex";
-import {Conversation} from '@/models/conversation';
-import {Contact} from '@/models/contact';
-import {Message} from '@/models/message';
-import {PropUpdate} from '@/models/propUpdate';
+import { Conversation } from "@/models/conversation";
+import { Contact } from "@/models/contact";
+import { Message } from "@/models/message";
+import { PropUpdate } from "@/models/propUpdate";
 
 @Component({
-  components: {ConversationIndex, ConversationView},
+  components: { ConversationIndex, ConversationView },
   computed: {
     isMulti: function() {
       return this.activeConvo.members.length > 2;
@@ -50,29 +50,35 @@ import {PropUpdate} from '@/models/propUpdate';
       return this.getUser.username;
     },
     ...mapGetters({
-      getUser: 'getUser',
-      contact: 'getContact',
-      contacts: 'getContacts',
-      conversation: 'getConversation',
-      conversations: 'getConversations',
-      active: 'activeID',
-      activeConvo: 'getActiveConversation',
-      connected: 'connected'
+      getUser: "getUser",
+      contact: "getContact",
+      contacts: "getContacts",
+      conversation: "getConversation",
+      conversations: "getConversations",
+      active: "activeID",
+      activeConvo: "getActiveConversation",
+      connected: "connected"
     })
   },
   created() {
     for (var c of this.conversations) {
-      if (c.active) this.$socket.emit('subscribe', c.id);
+      if (c.active) pass; //this.$socket.emit('subscribe', c.id);
     }
   },
   methods: {
     sendMessage: function(body) {
       if (this.isFirst) {
-        this.$socket.emit('start_conversation', this.activeConvo);
+        pass;
+        //this.$socket.emit('start_conversation', this.activeConvo);
       }
       if (this.isRecipients) {
-        let message = { convoID: this.active, author: this.username, body: body, timestamp: new Date() };
-        this.$socket.emit('message', this.active, message);
+        let message = {
+          convoID: this.active,
+          author: this.username,
+          body: body,
+          timestamp: new Date()
+        };
+        //this.$socket.emit('message', this.active, message);
         this.$store.dispatch("send_message", new Message(message));
       }
     },
@@ -91,7 +97,12 @@ import {PropUpdate} from '@/models/propUpdate';
           },
           created: new Date(),
           creator: this.username,
-          members: [ {username: this.username, avatar: "https://cdn.vuetifyjs.com/images/lists/1.jpg"} ],
+          members: [
+            {
+              username: this.username,
+              avatar: "https://cdn.vuetifyjs.com/images/lists/1.jpg"
+            }
+          ],
           messages: []
         });
         this.$store.dispatch("start_conversation", newConvo);
@@ -100,18 +111,25 @@ import {PropUpdate} from '@/models/propUpdate';
     },
     selectConvo: function(i) {
       this.$store.dispatch("select_conversation", i);
-      this.$store.dispatch("update_conversation", new PropUpdate({id: i, property: "unread", value: false}));
+      this.$store.dispatch(
+        "update_conversation",
+        new PropUpdate({ id: i, property: "unread", value: false })
+      );
     },
     deleteConvo: function(i) {
       this.$store.dispatch("delete_conversation", i);
     },
     updateRecipients: function(recipients) {
-      let self = new Contact({username: this.username, avatar: "https://cdn.vuetifyjs.com/images/lists/1.jpg"});
+      let self = new Contact({
+        username: this.username,
+        avatar: "https://cdn.vuetifyjs.com/images/lists/1.jpg"
+      });
       let allRecpients = recipients;
       allRecpients.push(self);
-      if (!this.isFirst) this.$socket.emit('set_recipients', allRecpients, this.activeConvo);
-      this.$store.dispatch("set_recipients", allRecpients);
-    },
+      if (!this.isFirst)
+        //this.$socket.emit('set_recipients', allRecpients, this.activeConvo);
+        this.$store.dispatch("set_recipients", allRecpients);
+    }
   }
 })
 export default class Chat extends Vue {}

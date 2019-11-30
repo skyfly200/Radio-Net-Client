@@ -32,35 +32,47 @@ const routes = [
   {
     path: "/dashboard",
     name: "Dashboard",
-    meta: { requiresAuth: true },
     component: () =>
-      import(/* webpackChunkName: "dashboard" */ "../views/Dashboard.vue")
+      import(/* webpackChunkName: "dashboard" */ "../views/Dashboard.vue"),
+    meta: {
+      requiresAuth: true
+    }
   },
   {
     path: "/admin",
     name: "admin",
-    meta: { requiresAuth: true },
     component: () =>
-      import(/* webpackChunkName: "admin" */ "../views/Admin.vue")
+      import(/* webpackChunkName: "admin" */ "../views/Admin.vue"),
+    meta: {
+      requiresAuth: true,
+      requiresRole: "admin"
+    }
   },
   {
     path: "/root",
     name: "root",
-    meta: { requiresAuth: true },
-    component: () => import(/* webpackChunkName: "root" */ "../views/Root.vue")
+    component: () => import(/* webpackChunkName: "root" */ "../views/Root.vue"),
+    meta: {
+      requiresAuth: true,
+      requiresRole: "root"
+    }
   },
   {
     path: "/chat",
     name: "chat",
-    meta: { requiresAuth: true },
-    component: () => import(/* webpackChunkName: "chat" */ "../views/Chat.vue")
+    component: () => import(/* webpackChunkName: "chat" */ "../views/Chat.vue"),
+    meta: {
+      requiresAuth: true
+    }
   },
   {
     path: "/share",
     name: "share",
-    meta: { requiresAuth: true },
     component: () =>
-      import(/* webpackChunkName: "share" */ "../views/Share.vue")
+      import(/* webpackChunkName: "share" */ "../views/Share.vue"),
+    meta: {
+      requiresAuth: true
+    }
   },
   {
     path: "/*",
