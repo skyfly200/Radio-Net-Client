@@ -1,78 +1,83 @@
-<template>
-  <div>
-    <v-navigation-drawer v-model="drawer" app>
-      <v-list dense>
-        <v-list-item link to="/">
-          <v-list-item-action>
-            <v-icon>mdi-home</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>Home</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item link to="/about">
-          <v-list-item-action>
-            <v-icon>mdi-information</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>About</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <template v-if="userLogedIn">
-          <v-divider></v-divider>
-          <v-list-item link to="/dashboard">
-            <v-list-item-action>
-              <v-icon>mdi-account</v-icon>
-            </v-list-item-action>
-            <v-list-item-content>
-              <v-list-item-title>Dashboard</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-          <v-list-item link to="/share">
-            <v-list-item-action>
-              <v-icon>mdi-file-cloud</v-icon>
-            </v-list-item-action>
-            <v-list-item-content>
-              <v-list-item-title>Content</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-          <v-list-item link @click="signout">
-            <v-list-item-action>
-              <v-icon>mdi-logout-variant</v-icon>
-            </v-list-item-action>
-            <v-list-item-content>
-              <v-list-item-title>Signout</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </template>
-      </v-list>
-    </v-navigation-drawer>
-    <v-app-bar app dense dark>
-      <v-app-bar-nav-icon @click="openDrawer"></v-app-bar-nav-icon>
-      <v-btn text style="cursor: pointer" to="/">Radio Net</v-btn>
-      <v-spacer></v-spacer>
-      <!-- sign out button -->
-      <v-btn text v-if="userLogedIn" @click="signout" class="hidden-xs-only">
-        <v-icon class="mr-2" right>mdi-logout-variant</v-icon>
-        <span>Logout</span>
-      </v-btn>
-      <!-- navigation bar links -->
-      <v-btn
-        text
-        v-else
-        class="hidden-xs-only"
-        v-for="item in items"
-        :key="item.title"
-        :to="item.link"
-      >
-        <v-icon class="mr-2" right>{{ item.icon }}</v-icon>
-        <span id="stream-info">{{ item.title }}</span>
-      </v-btn>
-      <template v-slot:extension>
-        <StreamPlayer />
-      </template>
-    </v-app-bar>
-  </div>
+<template lang="pug">
+  div
+    v-navigation-drawer(app v-model="drawer")
+      v-list.pa1
+        template(avatar v-if='userLogedIn')
+          v-list-item
+            v-list-item-avatar
+              v-img(:src="userLogedIn.photoURL")
+            v-list-item-content
+              .welcome
+                span Welcome&nbsp;
+                router-link(to='/profile') {{ username }}
+          v-divider
+          v-list-item(@click='signout')
+            v-list-item-action
+              v-icon mdi-logout-variant
+            v-list-item-content
+              v-list-item-title Logout
+        template(v-else)
+          v-list-item(to='/login')
+            v-list-item-action
+              v-icon mdi-login-variant
+            v-list-item-content
+              v-list-item-title Login
+          v-list-item(to='/register')
+            v-list-item-action
+              v-icon mdi-account-plus
+            v-list-item-content
+              v-list-item-title Register
+        v-divider
+        v-list-item(to='/')
+          v-list-item-action
+            v-icon mdi-home
+          v-list-item-content
+            v-list-item-title Home
+        v-list-item(to='/about')
+          v-list-item-action
+            v-icon mdi-information
+          v-list-item-content
+            v-list-item-title About
+        template(v-if='userLogedIn')
+          v-list-item(to='/dashboard')
+            v-list-item-action
+              v-icon mdi-account
+            v-list-item-content
+              v-list-item-title Dashboard
+          v-list-item(to='/groups')
+            v-list-item-action
+              v-icon mdi-account-group
+            v-list-item-content
+              v-list-item-title Groups
+          v-list-item(to='/chat')
+            v-list-item-action
+              v-icon mdi-message
+            v-list-item-content
+              v-list-item-title Chat
+          v-list-item(to='/share')
+            v-list-item-action
+              v-icon mdi-file-cloud
+            v-list-item-content
+              v-list-item-title Content
+    v-app-bar(app dense dark)
+      v-app-bar-nav-icon(@click="openDrawer")
+      v-btn(text style="cursor: pointer" to="/") Radio Net
+      v-spacer
+      #user
+        template(v-if='userLogedIn')
+          .user-img
+            v-img(:src="userLogedIn.photoURL" width="40")
+          .controls.pt-3
+            .welcome
+              span Welcome&nbsp;
+              router-link(to='/profile') {{ username }}
+            .logout
+              v-btn(text small @click='signout') Logout
+        template(v-else)
+          v-btn(text to='/login') Login
+          v-btn(text to='/register') Register
+      template(v-slot:extension)
+        StreamPlayer
 </template>
 <script>
 import StreamPlayer from "@/components/StreamPlayer.vue";
@@ -89,20 +94,8 @@ export default {
     userLogedIn() {
       return this.$store.getters.user;
     },
-    items() {
-      let menuItems = [
-        {
-          title: "Register",
-          icon: "mdi-account-plus",
-          link: "/register"
-        },
-        {
-          title: "Login",
-          icon: "mdi-login-variant",
-          link: "/login"
-        }
-      ];
-      return menuItems;
+    username() {
+      return this.$store.getters.user.displayName;
     }
   },
   methods: {
@@ -117,5 +110,20 @@ export default {
 </script>
 
 <style lang="sass">
-
+#links
+  margin: auto 1em
+#user
+  margin-left: 24px
+  display: flex
+  align-items: center
+  justify-content: center
+  .user-img
+    margin-right: 0.5em
+    .v-image
+      border-radius: 50%
+  .controls
+    display: flex
+    flex-direction: column
+    align-items: center
+    justify-content: center
 </style>
