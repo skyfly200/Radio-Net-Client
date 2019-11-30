@@ -2,7 +2,7 @@
 v-tooltip(:right="tooltip.right" :left="tooltip.left" :top="tooltip.top" :bottom="tooltip.bottom")
   template(v-slot:activator="{ on }")
     v-btn(@click="$emit('select')" icon small)
-      v-icon edit
+      v-icon mdi-pencil
   span {{ tooltip.text }}
 </template>
 <script>

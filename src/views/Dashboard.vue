@@ -23,11 +23,11 @@ v-container(fluid).dashboard
         v-card-title
           h3 Account Setting
         v-card-text
-          EditableField(title="Username" :v="username" icon="person").account-field.username
+          EditableField(title="Username" :v="username" icon="mdi-account").account-field.username
           v-divider
-          EditableField(title="Email" :v="email" icon="email").account-field.email
+          EditableField(title="Email" :v="email" icon="mdi-email").account-field.email
           v-divider
-          EditableField(title="Phone" :v="phone" icon="phone").account-field.phone
+          EditableField(title="Phone" :v="phone" icon="mdi-phone").account-field.phone
           v-divider
           br
           v-btn(primary to="/password").password-btn
@@ -54,6 +54,7 @@ import EditableField from "@/components/EditableField.vue";
     if (this.user) {
       this.name = this.user.displayName;
       this.email = this.user.email;
+      this.phone = this.user.phoneNumber;
       this.photo = this.user.photoURL;
       this.userId = this.user.uid;
     }
