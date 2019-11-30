@@ -2,10 +2,18 @@ import Vue from "vue";
 import Vuex from "vuex";
 import router from "../router";
 import firebase from "firebase";
+//import axios from "axios";
+
+import Chat from "./modules/chat";
+import Auth from "./modules/auth";
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
+  modules: {
+    chat: Chat,
+    auth: Auth
+  },
   state: {
     user: null,
     status: null,
@@ -15,15 +23,12 @@ export default new Vuex.Store({
     setUser(state, payload) {
       state.user = payload;
     },
-
     removeUser(state) {
       state.user = null;
     },
-
     setStatus(state, payload) {
       state.status = payload;
     },
-
     setError(state, payload) {
       state.error = payload;
     }

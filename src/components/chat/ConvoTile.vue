@@ -17,10 +17,7 @@ v-list-tile.conversation(@click="$emit('select')")
 <script>
 import { Component, Vue } from "vue-property-decorator";
 // import date-fns utils
-const isToday = require('date-fns/is_today');
-const isThisWeek = require('date-fns/is_this_week');
-const isThisYear = require('date-fns/is_this_year');
-const format = require('date-fns/format');
+import { format, isToday, isThisWeek, isThisYear } from "date-fns";
 
 @Component({
   props: ["c"],
@@ -31,22 +28,36 @@ const format = require('date-fns/format');
   },
   methods: {
     formatTimestamp: function(t) {
-      let f = isToday(t) ? format(t, "h:mm a") : (isThisWeek(t) ? format(t, "ddd") : (isThisYear ? format(t, "MMM Do") : format(t, "M/D/YY")));
+      let f = isToday(t)
+        ? format(t, "h:mm a")
+        : isThisWeek(t)
+        ? format(t, "ddd")
+        : isThisYear
+        ? format(t, "MMM Do")
+        : format(t, "M/D/YY");
       return f;
     },
     autoTitle: function(c) {
-      let auto = this.getOtherMembers(c.members).map(m => (this.titleCase(m.username))).join(', ');
-      return c.title ? c.title : (c.members.length > 1 ? (c.messages.length > 0 ? auto : "New Message to " + auto) : "New Message");
+      let auto = this.getOtherMembers(c.members)
+        .map(m => this.titleCase(m.username))
+        .join(", ");
+      return c.title
+        ? c.title
+        : c.members.length > 1
+        ? c.messages.length > 0
+          ? auto
+          : "New Message to " + auto
+        : "New Message";
     },
     getOtherMembers: function(members) {
-      return members ? members.filter( (m) => (m.username !== this.username)) : [];
+      return members ? members.filter(m => m.username !== this.username) : [];
     },
     selectConvoAvatar: function(c) {
       let members = this.getOtherMembers(c.members);
       return members.length && members[0] ? members[0].avatar : null;
     },
     titleCase: function(string) {
-      return (string ? string.charAt(0).toUpperCase() + string.slice(1) : "");
+      return string ? string.charAt(0).toUpperCase() + string.slice(1) : "";
     }
   }
 })

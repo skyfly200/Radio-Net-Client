@@ -19,11 +19,7 @@ import { Component, Vue } from "vue-property-decorator";
 import ConversationIndex from "@/components/chat/ConversationIndex.vue";
 import ConversationView from "@/components/chat/ConversationView.vue";
 // import date-fns utils
-// const isToday = require("date-fns/is_today");
-// const isThisWeek = require("date-fns/is_this_week");
-// const isThisYear = require("date-fns/is_this_year");
-// const getTime = require("date-fns/get_time");
-const format = require("date-fns/format");
+import { format, isToday, isThisWeek, isThisYear, getTime } from "date-fns";
 // vuex stuff
 import { mapGetters } from "vuex";
 import { Conversation } from "@/models/conversation";
@@ -61,9 +57,9 @@ import { PropUpdate } from "@/models/propUpdate";
     })
   },
   created() {
-    for (var c of this.conversations) {
-      if (c.active) pass; //this.$socket.emit('subscribe', c.id);
-    }
+    // for (var c of this.conversations) {
+    //   if (c.active) this.$socket.emit('subscribe', c.id);
+    // }
   },
   methods: {
     sendMessage: function(body) {

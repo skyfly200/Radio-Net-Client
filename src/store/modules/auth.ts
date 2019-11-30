@@ -5,7 +5,6 @@ import {
   MutationAction,
   Action
 } from "vuex-module-decorators";
-import axios from "axios";
 
 import { User } from "@/models/user";
 
@@ -26,18 +25,13 @@ export default class Auth extends VuexModule {
     data: object
   ) {
     try {
-      const response: any = await axios({
-        url: "http://localhost:1234/users/login",
-        data: data,
-        method: "POST"
-      });
+      const response: any = {};
       if (response.data.auth) {
         const token = response.data.token;
         const user = response.data.user;
         // MUST be changed to store JWT in cookie for security!!!
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
-        axios.defaults.headers.common["Authorization"] = token;
         return { status: "success", token: token, user: user };
       } else {
         return { status: "failed", token: "", user: {} };
@@ -50,16 +44,10 @@ export default class Auth extends VuexModule {
   @MutationAction({ mutate: ["status", "token", "user"] }) async logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    delete axios.defaults.headers.common["Authorization"];
     return { status: "", token: "", user: {} };
   }
 
   @Action register(data: object) {
-    axios({
-      url: "http://localhost:1234/users/register",
-      data: data,
-      method: "POST"
-    });
     return;
   }
 

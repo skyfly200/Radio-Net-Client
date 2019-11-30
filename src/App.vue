@@ -4,7 +4,7 @@
     <v-content>
       <router-view></router-view>
     </v-content>
-    <ChatBar />
+    <ChatBar v-if="showChat" />
   </v-app>
 </template>
 
@@ -19,6 +19,14 @@ import firebase from "firebase";
     Nav,
     ChatBar
   },
+  watch: {
+    $route(to, from) {
+      this.showChat = !["chat"].includes(to.name);
+    }
+  },
+  data: () => ({
+    showChat: true
+  }),
   methods: {}
 })
 export default class App extends Vue {}
