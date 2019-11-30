@@ -7,9 +7,9 @@
     v-btn( icon @click="toggleStream")
       v-icon {{ streamState ? "mdi-stop" : "mdi-play" }}
     v-progress-circular(v-if="streamLoading" indeterminate)
-    marquee( behavior="scroll" direction="left") {{ caption }}
+    marquee( behavior="scroll" direction="left").pt-3 {{ caption }}
     v-spacer
-    v-hover( v-slot:default="{ hover }" close-delay="500")
+    v-hover( v-slot:default="{ hover }" close-delay="300")
       div( class="volume-controls")
         v-btn( icon @click="mute")
           v-icon {{ volume === 0 ? "mdi-volume-high" : "mdi-volume-off" }}
