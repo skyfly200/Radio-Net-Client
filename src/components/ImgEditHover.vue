@@ -7,7 +7,7 @@ v-hover
           .chip-spacer(@click="$emit('open')")
             v-chip(outline color="white").edit-img-chip
               v-avatar
-                v-icon.edit-img photo_camera
+                v-icon.edit-img mdi-camera
               | Edit
 </template>
 <script>
@@ -17,7 +17,7 @@ import { Component, Vue } from "vue-property-decorator";
   props: ["src", "profile", "width", "editable"],
   computed: {
     w: function() {
-      return this.profile ? '200px' : (this.width ? this.width : '');
+      return this.profile ? "200px" : this.width ? this.width : "";
     }
   }
 })

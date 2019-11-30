@@ -8,15 +8,15 @@
     append-outer-icon="mdi-check"
     @click:append-outer="$emit('done', members)")
     template(v-slot:selection='data')
-      v-chip.chip--select-multi(:selected='data.selected' close @input='removeRecipient(data.item)')
+      v-chip.chip--select-multi(:input-value='data.selected' close @input='removeRecipient(data.item)')
         v-avatar
           img(:src='data.item.avatar')
         | {{ data.item.username }}
     template(v-slot:item='data')
-      v-list-tile-avatar
+      v-list-item-avatar
         img(:src='data.item.avatar')
-      v-list-tile-content
-        v-list-tile-title {{ data.item.username }}
+      v-list-item-content
+        v-list-item-title {{ data.item.username }}
 </template>
 <script>
 import { Component, Vue } from "vue-property-decorator";

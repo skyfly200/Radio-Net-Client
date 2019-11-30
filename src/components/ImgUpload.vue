@@ -6,7 +6,7 @@ v-dialog(v-model="toggle" max-width="1000").image-upload-dialog
       .uploader(v-if="noFiles")
         input.file-input(type="file" accept="image/*" ref="fileInput" :multiple="multi" @change="select")
         form.drop-zone(v-if="dragAndDropCapable" ref="dropZone" :class="{ dragging: dragging }")
-          v-icon image
+          v-icon mdi-image
           p Drag and drop here
           span or
           br
@@ -23,7 +23,7 @@ v-dialog(v-model="toggle" max-width="1000").image-upload-dialog
             h4.img-title {{ files[key].name }}
             .img-size {{ toMB(files[key].size).toFixed(2) }}MB
             v-btn.remove-btn(v-if="multi" small flat @click="remove(key)")
-              v-icon(small) close
+              v-icon(small) mdi-close
               | remove
         v-btn(@click="clear") Clear
         progress(v-if="uploading" max="100" :value.prop="uploadPercentage")
@@ -51,13 +51,13 @@ import { Component, Vue } from "vue-property-decorator";
     error: false,
     sizeLimit: 10 // in MB
   }),
-  mounted(){
+  mounted() {
     this.dragAndDropCapable = this.determineDragAndDropCapable();
   },
-  updated(){
+  updated() {
     // wait until the entire view has been rendered
     this.$nextTick(() => {
-      if( this.dragAndDropCapable && this.$refs.dropZone ){
+      if (this.dragAndDropCapable && this.$refs.dropZone) {
         this.register();
       }
     });
@@ -70,42 +70,63 @@ import { Component, Vue } from "vue-property-decorator";
   methods: {
     register: function() {
       // bind an event listener to all of the drag events
-      ['drag', 'dragstart'].forEach( function( evt ) {
-        this.$refs.dropZone.addEventListener(evt, function(e){
-          e.preventDefault();
-          e.stopPropagation();
-        }.bind(this), false);
-      }.bind(this));
-      ['dragover', 'dragenter'].forEach( function( evt ) {
-        this.$refs.dropZone.addEventListener(evt, function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          this.dragging = true;
-          e.dataTransfer.dropEffect = "copy";
-        }.bind(this));
-      }.bind(this), false);
-      ['dragleave', 'dragend'].forEach( function( evt ) {
-        this.$refs.dropZone.addEventListener(evt, function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          this.dragging = false;
-        }.bind(this));
-      }.bind(this), false);
-      this.$refs.dropZone.addEventListener('drop', function(e){
-        if (this.dragging) {
-          e.preventDefault();
-          e.stopPropagation();
-          this.dragging = false;
-          for( let i = 0; i < e.dataTransfer.files.length; i++ ){
-            this.load(e.dataTransfer.files[i]);
+      ["drag", "dragstart"].forEach(
+        function(evt) {
+          this.$refs.dropZone.addEventListener(
+            evt,
+            function(e) {
+              e.preventDefault();
+              e.stopPropagation();
+            }.bind(this),
+            false
+          );
+        }.bind(this)
+      );
+      ["dragover", "dragenter"].forEach(
+        function(evt) {
+          this.$refs.dropZone.addEventListener(
+            evt,
+            function(e) {
+              e.preventDefault();
+              e.stopPropagation();
+              this.dragging = true;
+              e.dataTransfer.dropEffect = "copy";
+            }.bind(this)
+          );
+        }.bind(this),
+        false
+      );
+      ["dragleave", "dragend"].forEach(
+        function(evt) {
+          this.$refs.dropZone.addEventListener(
+            evt,
+            function(e) {
+              e.preventDefault();
+              e.stopPropagation();
+              this.dragging = false;
+            }.bind(this)
+          );
+        }.bind(this),
+        false
+      );
+      this.$refs.dropZone.addEventListener(
+        "drop",
+        function(e) {
+          if (this.dragging) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.dragging = false;
+            for (let i = 0; i < e.dataTransfer.files.length; i++) {
+              this.load(e.dataTransfer.files[i]);
+            }
           }
-        }
-      }.bind(this));
+        }.bind(this)
+      );
     },
     select: function(e) {
       var fileList = e.target.files;
       this.clear();
-      for (var i=0; i<fileList.length; i++) {
+      for (var i = 0; i < fileList.length; i++) {
         this.load(fileList[i]);
       }
     },
@@ -126,24 +147,38 @@ import { Component, Vue } from "vue-property-decorator";
     show: function(file) {
       var reader = new FileReader();
       // Register file reader events
-      reader.onload = (cb => { return e => {cb(e.target.result)} })(result => {
-        this.fileUrls.push(result)
-      } );
-      reader.onerror = (cb => { return e => {cb(e.target.error)} })(error => {this.message = error; this.error = true;} );
+      reader.onload = (cb => {
+        return e => {
+          cb(e.target.result);
+        };
+      })(result => {
+        this.fileUrls.push(result);
+      });
+      reader.onerror = (cb => {
+        return e => {
+          cb(e.target.error);
+        };
+      })(error => {
+        this.message = error;
+        this.error = true;
+      });
       // Call reader with file
       reader.readAsDataURL(file);
     },
     remove: function(key) {
-      this.files.splice( key, 1 );
-      this.fileUrls.splice( key, 1 );
+      this.files.splice(key, 1);
+      this.fileUrls.splice(key, 1);
     },
     toMB: function(bytes) {
       return bytes / 1048576.0;
     },
-    determineDragAndDropCapable(){
-      var div = document.createElement('div');
-      return ( ( 'draggable' in div ) || ( 'ondragstart' in div && 'ondrop' in div ) )
-              && 'FormData' in window && 'FileReader' in window;
+    determineDragAndDropCapable() {
+      var div = document.createElement("div");
+      return (
+        ("draggable" in div || ("ondragstart" in div && "ondrop" in div)) &&
+        "FormData" in window &&
+        "FileReader" in window
+      );
     },
     checkType: function(file) {
       if (!file.type) return false;
@@ -151,7 +186,7 @@ import { Component, Vue } from "vue-property-decorator";
       return false;
     },
     checkSize: function(file) {
-      return !!file.size || file.size <= (this.sizeLimit * 1048576);
+      return !!file.size || file.size <= this.sizeLimit * 1048576;
     },
     clear: function() {
       this.files = [];
@@ -168,29 +203,35 @@ import { Component, Vue } from "vue-property-decorator";
       this.error = false;
       this.message = "";
       let formData = new FormData();
-      for( var i = 0; i < this.files.length; i++ ){
-        formData.append('files[' + i + ']', this.files[i]);
+      for (var i = 0; i < this.files.length; i++) {
+        formData.append("files[" + i + "]", this.files[i]);
       }
       this.$http({
         url: "http://localhost:1234/images/" + this.type,
         data: formData,
         method: "POST",
-        headers: { 'Content-Type': 'multipart/form-data' },
-        onUploadProgress: function( progressEvent ) {
-          this.uploadPercentage = parseInt( Math.round( ( progressEvent.loaded * 100 ) / progressEvent.total ) );
+        headers: { "Content-Type": "multipart/form-data" },
+        onUploadProgress: function(progressEvent) {
+          this.uploadPercentage = parseInt(
+            Math.round((progressEvent.loaded * 100) / progressEvent.total)
+          );
         }.bind(this)
       })
-      .then(function(resp){
-        // emit done event, passing the upload response & clear data
-        this.$emit("done", resp);
-        this.clear();
-      }.bind(this))
-      .catch(function(error){
-        // Display upload Error message
-        this.uploading = false;
-        this.message = error;
-        this.error = true;
-      }.bind(this));
+        .then(
+          function(resp) {
+            // emit done event, passing the upload response & clear data
+            this.$emit("done", resp);
+            this.clear();
+          }.bind(this)
+        )
+        .catch(
+          function(error) {
+            // Display upload Error message
+            this.uploading = false;
+            this.message = error;
+            this.error = true;
+          }.bind(this)
+        );
     },
     closeDialog: function() {
       this.$emit("close");

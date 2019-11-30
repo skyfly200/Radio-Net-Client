@@ -11,7 +11,7 @@ import { Component, Vue } from "vue-property-decorator";
 @Component({
   props: ["tooltip"]
 })
-export default class FabBtn extends Vue {}
+export default class EditBtn extends Vue {}
 </script>
 <style lang="sass" scoped>
 .d-flex

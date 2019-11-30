@@ -5,12 +5,10 @@ v-list-item.conversation(@click="$emit('select')")
     v-icon(v-else large) mdi-account
   v-list-item-content(:class="{ unread: c.unread }")
     v-list-item-title
-      h5
-        span {{ autoTitle(c) }}
-    v-list-item-sub-title
+      h5 {{ autoTitle(c) }}
       span(v-if="c.messages.length").message-body {{ c.messages[c.messages.length - 1].body }}
   v-list-item-action
-    v-btn(v-if="!c.messages.length" icon flat @click="$emit('delete')")
+    v-btn(v-if="!c.messages.length" icon text @click="$emit('delete')")
       v-icon mdi-close
     span(v-else).timestamp {{ formatTimestamp(c.messages[c.messages.length - 1].timestamp) }}
 </template>

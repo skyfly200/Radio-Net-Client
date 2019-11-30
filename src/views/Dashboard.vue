@@ -37,11 +37,10 @@ v-container(fluid).dashboard
 
 <script>
 import { Component, Vue } from "vue-property-decorator";
-import FabBtn from "@/components/FabBtn.vue";
 import EditableField from "@/components/EditableField.vue";
 
 @Component({
-  components: { FabBtn, EditableField },
+  components: { EditableField },
   data: () => ({
     email: "user@example.com",
     phone: "720-555-5555",

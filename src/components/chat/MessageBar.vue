@@ -23,38 +23,38 @@
           v-btn(icon v-on="on")
             v-icon mdi-dots-vertical
         v-list(dense)
-          v-list-tile(@click="menu = 'search'")
-            v-list-tile-action
+          v-list-item(@click="menu = 'search'")
+            v-list-item-action
               v-icon mdi-magnify
-            v-list-tile-title Search Conversation
-          v-list-tile(v-if="isMulti" @click="menu = 'title'")
-            v-list-tile-action
+            v-list-item-title Search Conversation
+          v-list-item(v-if="isMulti" @click="menu = 'title'")
+            v-list-item-action
               v-icon mdi-format-title
-            v-list-tile-title Rename Conversation
-          v-list-tile(v-if="isMulti && isOwner" @click="menu = 'recipients'")
-            v-list-tile-action
+            v-list-item-title Rename Conversation
+          v-list-item(v-if="isMulti && isOwner" @click="menu = 'recipients'")
+            v-list-item-action
               v-icon mdi-account-plus
-            v-list-tile-title Edit Recipients
-          v-list-tile(v-if="isMulti" @click="$emit('leave', conversation.id)")
-            v-list-tile-action
+            v-list-item-title Edit Recipients
+          v-list-item(v-if="isMulti" @click="$emit('leave', conversation.id)")
+            v-list-item-action
               v-icon mdi-minus-circle
-            v-list-tile-title Leave Conversation
-          v-list-tile(@click="$emit('delete', conversation.id)")
-            v-list-tile-action
+            v-list-item-title Leave Conversation
+          v-list-item(@click="$emit('delete', conversation.id)")
+            v-list-item-action
               v-icon mdi-delete
-            v-list-tile-title Delete Conversation
-          v-list-tile(@click="$emit('pane', 'notifications')")
-            v-list-tile-action
+            v-list-item-title Delete Conversation
+          v-list-item(@click="$emit('pane', 'notifications')")
+            v-list-item-action
               v-icon mdi-bell-off
-            v-list-tile-title Mute Notifications
-          v-list-tile(@click="$emit('pane', 'style')")
-            v-list-tile-action
+            v-list-item-title Mute Notifications
+          v-list-item(@click="$emit('pane', 'style')")
+            v-list-item-action
               v-icon mdi-palette
-            v-list-tile-title Set Conversation Styles
-          v-list-tile(@click="$emit('pane', 'info')")
-            v-list-tile-action
+            v-list-item-title Set Conversation Styles
+          v-list-item(@click="$emit('pane', 'info')")
+            v-list-item-action
               v-icon mdi-information
-            v-list-tile-title Info
+            v-list-item-title Info
 </template>
 <script>
 import { Component, Vue } from "vue-property-decorator";

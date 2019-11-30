@@ -6,7 +6,7 @@ v-dialog(v-model="toggle").file-upload-dialog
       .uploader(v-if="noFiles")
         .drop_zone Drag and drop {{ multi ? "files" : "a file"}} here
         p or
-        input(type="file" label="Browse files" :multiple="multi" @change="load" append-icon="photo_camera")
+        input(type="file" label="Browse files" :multiple="multi" @change="load" append-icon="mdi-camera")
         h4 {{ sizeLimit }}MB {{ multi ? "max per file" : "max"}}
         v-alert(:value="error" type="error") {{ message }}
       .file-preview(v-else)
@@ -53,8 +53,19 @@ import { Component, Vue } from "vue-property-decorator";
           this.error = true;
         } else if (file.type && file.size) {
           // Register file reader events
-          reader.onload = (cb => { return e => {cb(e.target.result)} })(result => this.files.push(result) );
-          reader.onerror = (cb => { return e => {cb(e.target.error)} })(error => {this.message = error; this.error = true;} );
+          reader.onload = (cb => {
+            return e => {
+              cb(e.target.result);
+            };
+          })(result => this.files.push(result));
+          reader.onerror = (cb => {
+            return e => {
+              cb(e.target.error);
+            };
+          })(error => {
+            this.message = error;
+            this.error = true;
+          });
           // Call reader with file
           reader.readAsDataURL(file);
         }
@@ -62,7 +73,8 @@ import { Component, Vue } from "vue-property-decorator";
     },
     checkType: function(file) {
       let validType;
-      for (let t in this.types) validType = validType || file.type && file.type.match(this.types[t]);
+      for (let t in this.types)
+        validType = validType || (file.type && file.type.match(this.types[t]));
       return validType;
     },
     checkSize: function(file) {
