@@ -1,7 +1,7 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import store from "../store/index";
-import Home from "../views/Home.vue";
+import store from "@/store/index";
+import Home from "@/views/Home.vue";
 
 Vue.use(VueRouter);
 
@@ -14,26 +14,24 @@ const routes = [
   {
     path: "/about",
     name: "about",
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/About.vue")
+    component: () => import(/* webpackChunkName: "about" */ "@/views/About.vue")
   },
   {
-    path: "/register",
+    path: "/register/:redirect?",
     name: "register",
     component: () =>
-      import(/* webpackChunkName: "register" */ "../views/Register.vue")
+      import(/* webpackChunkName: "register" */ "@/views/Register.vue")
   },
   {
-    path: "/login",
+    path: "/login/:redirect?",
     name: "login",
-    component: () =>
-      import(/* webpackChunkName: "login" */ "../views/Login.vue")
+    component: () => import(/* webpackChunkName: "login" */ "@/views/Login.vue")
   },
   {
     path: "/dashboard",
     name: "Dashboard",
     component: () =>
-      import(/* webpackChunkName: "dashboard" */ "../views/Dashboard.vue"),
+      import(/* webpackChunkName: "dashboard" */ "@/views/Dashboard.vue"),
     meta: {
       requiresAuth: true
     }
@@ -42,7 +40,7 @@ const routes = [
     path: "/admin",
     name: "admin",
     component: () =>
-      import(/* webpackChunkName: "admin" */ "../views/Admin.vue"),
+      import(/* webpackChunkName: "admin" */ "@/views/Admin.vue"),
     meta: {
       requiresAuth: true,
       requiresRole: "admin"
@@ -51,7 +49,7 @@ const routes = [
   {
     path: "/root",
     name: "root",
-    component: () => import(/* webpackChunkName: "root" */ "../views/Root.vue"),
+    component: () => import(/* webpackChunkName: "root" */ "@/views/Root.vue"),
     meta: {
       requiresAuth: true,
       requiresRole: "root"
@@ -60,7 +58,7 @@ const routes = [
   {
     path: "/chat",
     name: "chat",
-    component: () => import(/* webpackChunkName: "chat" */ "../views/Chat.vue"),
+    component: () => import(/* webpackChunkName: "chat" */ "@/views/Chat.vue"),
     meta: {
       requiresAuth: true
     }
@@ -69,7 +67,34 @@ const routes = [
     path: "/share",
     name: "share",
     component: () =>
-      import(/* webpackChunkName: "share" */ "../views/Share.vue"),
+      import(/* webpackChunkName: "share" */ "@/views/Share.vue"),
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: "/profile/:username?",
+    name: "profile",
+    component: () =>
+      import(/* webpackChunkName: "profile" */ "@/views/Profile.vue"),
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: "/groups",
+    name: "groups",
+    component: () =>
+      import(/* webpackChunkName: "groups" */ "@/views/Groups.vue"),
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: "/group/:title",
+    name: "group",
+    component: () =>
+      import(/* webpackChunkName: "group" */ "@/views/Group.vue"),
     meta: {
       requiresAuth: true
     }
@@ -78,7 +103,7 @@ const routes = [
     path: "/*",
     name: "Error404",
     component: () =>
-      import(/* webpackChunkName: "error404" */ "../views/404.vue")
+      import(/* webpackChunkName: "error404" */ "@/views/404.vue")
   }
 ];
 
@@ -91,7 +116,7 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
     // this route requires auth, check if logged in
-    // if not, redirect to login page.
+    // if not, send to login page with redirect
     let auth = store.getters.getUser;
     if (!auth) {
       next({
