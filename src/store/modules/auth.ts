@@ -35,19 +35,21 @@ export default class Auth extends VuexModule {
     this.status = payload.status;
     this.token = payload.token;
     this.raw = raw;
-    this.user = new User({
-      uid: raw.uid,
-      name: raw.displayName,
-      email: raw.email,
-      phone: raw.phoneNumber,
-      photoURL: raw.photoURL,
-      providers: raw.providerData,
-      active: raw.emailVerified
-    });
+    this.user = raw
+      ? new User({
+          uid: raw.uid,
+          name: raw.displayName,
+          email: raw.email,
+          phone: raw.phoneNumber,
+          photoURL: raw.photoURL,
+          providers: raw.providerData,
+          active: raw.emailVerified
+        })
+      : null;
     this.error = payload.error;
   }
 
-  @Action
+  @Action({ rawError: true })
   async signInAction(payload: { email: string; password: string }) {
     let t = this;
     await firebase
@@ -72,21 +74,20 @@ export default class Auth extends VuexModule {
       });
   }
 
-  @Action
+  @Action({ rawError: true })
   async signOutAction() {
-    this.context.commit("setStatus", "loading");
     let t = this;
+    t.context.commit("setAuth", {
+      status: "success",
+      token: null,
+      user: null,
+      error: null
+    });
     await firebase
       .auth()
       .signOut()
       .then(response => {
         router.push("login");
-        t.context.commit("setAuth", {
-          status: "success",
-          token: null,
-          user: null,
-          error: null
-        });
       })
       .catch(error => {
         t.context.commit("setAuth", {
@@ -98,7 +99,7 @@ export default class Auth extends VuexModule {
       });
   }
 
-  @Action
+  @Action({ rawError: true })
   async signUpAction(payload: { email: string; password: string }) {
     this.context.commit("setStatus", "loading");
     this.context.commit("setProvider", "email");
