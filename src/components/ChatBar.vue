@@ -38,16 +38,18 @@
               <span>{{ chat.title }}</span>
             </v-btn>
           </template>
-          <v-sheet class="chat-window pb-3" height="50vh" width="300px">
-            <v-toolbar dense flat>
-              <h3>{{ chat.title }}</h3>
-              <v-spacer />
-              <v-btn @click="menu = false" right icon small>
-                <v-icon>mdi-close</v-icon>
-              </v-btn>
-            </v-toolbar>
-            <v-divider />
-            <Chat :id="chat.id" />
+          <v-sheet>
+            <conversation-view
+              height="50vh"
+              width="300px"
+              :contacts="contacts"
+              :conversation="activeConvo"
+              @sendMessage="sendMessage($event)"
+              @updateTitle="activeConvo.title = $event"
+              @updateRecipients="updateRecipients($event)"
+              @leave="leaveConvo($event)"
+              @delete="deleteConvo($event)"
+            />
           </v-sheet>
         </v-menu>
         <v-btn @click="showChatBar = !showChatBar" text small>
@@ -58,10 +60,16 @@
   </div>
 </template>
 <script>
-import Chat from "@/components/Chat.vue";
+import { mapGetters } from "vuex";
+import { Conversation } from "@/models/conversation";
+import { Contact } from "@/models/contact";
+import { Message } from "@/models/message";
+import { PropUpdate } from "@/models/propUpdate";
+import { format, isToday, isThisWeek, isThisYear, getTime } from "date-fns";
+import ConversationView from "@/components/chat/ConversationView.vue";
 export default {
   components: {
-    Chat
+    ConversationView
   },
   data() {
     return {
@@ -71,13 +79,103 @@ export default {
     };
   },
   computed: {
-    userLoggedIn() {
-      return this.$store.getters.getUser;
+    isMulti: function() {
+      return this.activeConvo.members.length > 2;
+    },
+    isRecipients: function() {
+      return this.activeConvo.members.length > 1;
+    },
+    isFirst: function() {
+      return this.activeConvo.messages.length === 0;
+    },
+    isNew: function() {
+      return this.conversations[0] && this.conversations[0].members.length <= 1;
+    },
+    username: function() {
+      return this.getUser.username;
+    },
+    ...mapGetters({
+      getUser: "getUser",
+      userLoggedIn: "isLoggedIn",
+      contact: "getContact",
+      contacts: "getContacts",
+      conversation: "getConversation",
+      conversations: "getConversations",
+      active: "activeID",
+      activeConvo: "getActiveConversation"
+    })
+  },
+  methods: {
+    sendMessage: function(body) {
+      if (this.isFirst) {
+        pass;
+        //this.$socket.emit('start_conversation', this.activeConvo);
+      }
+      if (this.isRecipients) {
+        let message = {
+          convoID: this.active,
+          author: this.username,
+          body: body,
+          timestamp: new Date()
+        };
+        //this.$socket.emit('message', this.active, message);
+        this.$store.dispatch("send_message", new Message(message));
+      }
+    },
+    newConversation: function() {
+      if (!this.isNew) {
+        let newConvo = new Conversation({
+          id: new Date().getTime(),
+          unread: false,
+          title: "",
+          styles: {
+            color: "default",
+            density: "medium"
+          },
+          notifications: {
+            state: true
+          },
+          created: new Date(),
+          creator: this.username,
+          members: [
+            {
+              username: this.username,
+              avatar: "https://cdn.vuetifyjs.com/images/lists/1.jpg"
+            }
+          ],
+          messages: []
+        });
+        this.$store.dispatch("start_conversation", newConvo);
+        this.$store.dispatch("select_conversation", newConvo.id);
+      }
+    },
+    selectConvo: function(i) {
+      this.$store.dispatch("select_conversation", i);
+      this.$store.dispatch(
+        "update_conversation",
+        new PropUpdate({ id: i, property: "unread", value: false })
+      );
+    },
+    deleteConvo: function(i) {
+      this.$store.dispatch("delete_conversation", i);
+    },
+    leaveConvo: function(i) {
+      //this.$store.dispatch("leave_conversation", i);
+    },
+    updateRecipients: function(recipients) {
+      let self = new Contact({
+        username: this.username,
+        avatar: "https://cdn.vuetifyjs.com/images/lists/1.jpg"
+      });
+      let allRecpients = recipients;
+      allRecpients.push(self);
+      if (!this.isFirst)
+        //this.$socket.emit('set_recipients', allRecpients, this.activeConvo);
+        this.$store.dispatch("set_recipients", allRecpients);
     }
   }
 };
 </script>
 <style lang="sass" scoped>
 .chat-window
-  overflow-y: hidden
 </style>

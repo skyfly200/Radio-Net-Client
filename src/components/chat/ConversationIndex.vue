@@ -1,5 +1,5 @@
 <template lang="pug">
-  v-flex.conversations(sm4)
+  .conversations
     SearchBar(@new="$emit('new')" @query="updateQuery($event)" @filter="showFilters = !showFilters")
     Filters(:show="showFilters" @filter="updateFilters($event)")
     ConvoList(:conversations="filteredConversations" @select="$emit('select', $event)" @delete="$emit('delete', $event)")

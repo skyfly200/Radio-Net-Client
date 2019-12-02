@@ -1,17 +1,19 @@
 <template lang="pug">
 v-container(fluid grid-list-md).chat
   v-layout.layout
-    ConversationIndex(:conversations="conversations"
-      @select="selectConvo($event)"
-      @new="newConversation"
-      @delete="deleteConvo($event)")
+    v-flex.conversations(sm4)
+      ConversationIndex(:conversations="conversations"
+        @select="selectConvo($event)"
+        @new="newConversation"
+        @delete="deleteConvo($event)")
     v-divider(vertical)
-    ConversationView(:contacts="contacts" :conversation="activeConvo"
-      @sendMessage="sendMessage($event)"
-      @updateTitle="activeConvo.title = $event"
-      @updateRecipients="updateRecipients($event)"
-      @leave=""
-      @delete="deleteConvo($event)")
+    v-flex.active-conversation(sm8)
+      ConversationView(:contacts="contacts" :conversation="activeConvo"
+        @sendMessage="sendMessage($event)"
+        @updateTitle="activeConvo.title = $event"
+        @updateRecipients="updateRecipients($event)"
+        @leave=""
+        @delete="deleteConvo($event)")
 </template>
 
 <script>
@@ -52,8 +54,7 @@ import { PropUpdate } from "@/models/propUpdate";
       conversation: "getConversation",
       conversations: "getConversations",
       active: "activeID",
-      activeConvo: "getActiveConversation",
-      connected: "connected"
+      activeConvo: "getActiveConversation"
     })
   },
   created() {

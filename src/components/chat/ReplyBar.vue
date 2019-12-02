@@ -96,8 +96,6 @@ import _ from "lodash";
 export default class ReplyBar extends Vue {}
 </script>
 <style lang="sass" scoped>
-.reply
-  margin-bottom: -30px
 .reply-bar
   display: flex
   button i

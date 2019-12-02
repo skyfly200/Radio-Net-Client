@@ -1,13 +1,13 @@
 <template lang="pug">
-  v-flex.active-conversation(sm8)
-    MessageBar(v-if="conversation" :conversation="conversation" :contacts="contacts"
+  .active-conversation
+    MessageBar(v-if="conversation !== null" :conversation="conversation" :contacts="contacts"
       @leave="$emit('leave', $event)"
       @delete="$emit('delete', $event)"
       @pane="pane = $event"
       @updateTitle="$emit('updateTitle', $event)"
       @updateRecipients="$emit('updateRecipients', $event)")
     .body
-      v-flex.pane(v-if="pane !== ''" pa4)
+      v-flex.pane(v-if="pane !== ''")
         template(v-if="pane === 'notifications'")
           h3.pane-title Mute Notifications
           .pane-content.notifications
@@ -78,33 +78,32 @@ import ReplyBar from "@/components/chat/ReplyBar.vue";
     },
     isRecipients: function() {
       return this.conversation.members.length > 1;
-    },
+    }
   }
 })
 export default class ConversationView extends Vue {}
 </script>
 <style lang="sass" scoped>
-  .active-conversation
+.active-conversation
+  .body
     height: 100%
-    .body
+    display: flex
+    justify-content: flex-end
+    flex-direction: column
+  .pane
+    text-align: center
+    height: 100%
+    display: flex
+    flex-direction: column
+    justify-content: space-between
+    .pane-title
+      padding-top: 1em
+    .pane-content
+      padding: 1em
+      width: 100%
       height: 100%
-      display: flex
-      justify-content: flex-end
-      flex-direction: column
-    .pane
-      text-align: center
-      height: 100%
-      display: flex
-      flex-direction: column
-      justify-content: space-between
-      .pane-title
-        padding-top: 1em
-      .pane-content
-        padding: 1em
-        width: 100%
-        height: 100%
-      .information
-        text-align: left
-        .info-item
-          padding-bottom: 2em
+    .information
+      text-align: left
+      .info-item
+        padding-bottom: 2em
 </style>

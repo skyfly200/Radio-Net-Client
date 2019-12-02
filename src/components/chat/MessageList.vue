@@ -51,7 +51,7 @@ export default class MessageList extends Vue {}
 </script>
 <style lang="sass" scoped>
 .messages
-  height: 100%
+  height: 66vh
   display: flex
   flex-direction: column
   justify-content: flex-end
