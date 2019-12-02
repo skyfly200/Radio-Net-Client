@@ -13,6 +13,8 @@ import { User } from "@/models/user";
 @Module
 export default class Auth extends VuexModule {
   status: string | null = null;
+  token: string | null = null;
+  provider: string | null = null;
   raw: object | null = null;
   user: User | null = new User();
   error: string | null = null;
@@ -23,9 +25,25 @@ export default class Auth extends VuexModule {
   }
 
   @Mutation
+  setProvider(provider: string | null) {
+    this.provider = provider;
+  }
+
+  @Mutation
   setAuth(payload: any) {
+    let raw = payload.user;
     this.status = payload.status;
-    this.raw = payload.user;
+    this.token = payload.token;
+    this.raw = raw;
+    this.user = new User({
+      uid: raw.uid,
+      name: raw.displayName,
+      email: raw.email,
+      phone: raw.phoneNumber,
+      photoURL: raw.photoURL,
+      providers: raw.providerData,
+      active: raw.emailVerified
+    });
     this.error = payload.error;
   }
 
@@ -40,6 +58,7 @@ export default class Auth extends VuexModule {
         t.context.commit("setAuth", {
           status: "success",
           user: response.user,
+          token: null,
           error: null
         });
       })
@@ -47,6 +66,7 @@ export default class Auth extends VuexModule {
         t.context.commit("setAuth", {
           status: "failure",
           user: null,
+          token: null,
           error: error.message
         });
       });
@@ -63,6 +83,7 @@ export default class Auth extends VuexModule {
         router.push("login");
         t.context.commit("setAuth", {
           status: "success",
+          token: null,
           user: null,
           error: null
         });
@@ -70,6 +91,7 @@ export default class Auth extends VuexModule {
       .catch(error => {
         t.context.commit("setAuth", {
           status: "failure",
+          token: null,
           user: null,
           error: error.message
         });
@@ -79,6 +101,7 @@ export default class Auth extends VuexModule {
   @Action
   async signUpAction(payload: { email: string; password: string }) {
     this.context.commit("setStatus", "loading");
+    this.context.commit("setProvider", "email");
     let t = this;
     firebase
       .auth()
@@ -87,6 +110,7 @@ export default class Auth extends VuexModule {
         router.push("dashboard");
         t.context.commit("setAuth", {
           status: "success",
+          token: null,
           user: response.user,
           error: null
         });
@@ -94,6 +118,7 @@ export default class Auth extends VuexModule {
       .catch(error => {
         t.context.commit("setAuth", {
           status: "failure",
+          token: null,
           user: null,
           error: error.message
         });
@@ -103,6 +128,7 @@ export default class Auth extends VuexModule {
   @Action({ rawError: true })
   async providerSignIn(p: string) {
     this.context.commit("setStatus", "loading");
+    this.context.commit("setProvider", p);
     var provider;
     switch (p) {
       case "fb":
@@ -125,18 +151,25 @@ export default class Auth extends VuexModule {
           t.context.commit("setAuth", {
             status: "success",
             user: result.user,
+            token: result.credential.accessToken,
             error: null
           });
         } else {
           t.context.commit("setAuth", {
             status: "failure",
+            token: null,
             user: null,
             error: ""
           });
         }
       })
       .catch(function(error: any) {
-        return { status: "failure", user: null, error: error.message };
+        return {
+          status: "failure",
+          user: null,
+          token: null,
+          error: error.message
+        };
       });
   }
 

@@ -1,8 +1,12 @@
 export class User {
-  _id: string = '';
-  username: string = '';
+  uid: string = "";
+  name: string = "";
+  email: string = "";
+  phone: string | null = null;
+  photoURL: string | null = null;
+  providers: Array<Object> = [];
   active: boolean = false;
-  roles: Array<string> = [""];
+  roles: Array<string> = [];
   constructor(data: User | {} = {}) {
     Object.assign(this, data);
   }
