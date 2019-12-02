@@ -163,6 +163,10 @@ export default class Chat extends VuexModule {
     this.contacts = contacts;
   }
 
+  @Mutation set_conversation(conversation: Conversation) {
+    this.conversations[index] = conversation;
+  }
+
   @Action({ commit: "set_contacts" }) load_contacts() {
     return [new Contact()];
   }
@@ -226,9 +230,31 @@ export default class Chat extends VuexModule {
     }
   }
 
-  @MutationAction({ mutate: ["conversations"] }) async load_conversations() {
+  @Action async load_conversations() {
     // get users conversations with axios here using await
-    return { conversations: [new Conversation()] };
+    var query = firebase
+      .firestore()
+      .collection("chats")
+      .doc("public")
+      .collection("messages")
+      .orderBy("timestamp")
+      .limit(12);
+
+    let t = this;
+    // Start listening to the query.
+    query.onSnapshot(function(snapshot) {
+      var index: number = t.conversations.findIndex(c => t.active === c.id);
+      var messages = t.conversations[index].messages;
+      snapshot.docChanges().forEach(function(change) {
+        if (change.type === "removed") {
+          //deleteMessage(change.doc.id);
+        } else {
+          var message = change.doc.data();
+          messages.push(new Message(message));
+        }
+      });
+      t.context.commit("set_conversation", messages);
+    });
   }
 
   @Action({ commit: "set_active_conversation" }) async select_conversation(

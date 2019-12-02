@@ -38,10 +38,8 @@
               <span>{{ chat.title }}</span>
             </v-btn>
           </template>
-          <v-sheet>
+          <v-sheet height="50vh" width="300px">
             <conversation-view
-              height="50vh"
-              width="300px"
               :contacts="contacts"
               :conversation="activeConvo"
               @sendMessage="sendMessage($event)"
@@ -160,7 +158,7 @@ export default {
       this.$store.dispatch("delete_conversation", i);
     },
     leaveConvo: function(i) {
-      //this.$store.dispatch("leave_conversation", i);
+      this.$store.dispatch("leave_conversation", i);
     },
     updateRecipients: function(recipients) {
       let self = new Contact({

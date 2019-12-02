@@ -86,7 +86,6 @@ export default class ConversationView extends Vue {}
 <style lang="sass" scoped>
 .active-conversation
   .body
-    height: 100%
     display: flex
     justify-content: flex-end
     flex-direction: column
