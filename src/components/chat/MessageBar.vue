@@ -74,16 +74,14 @@ import UserSelector from "@/components/chat/UserSelector.vue";
     this.title = this.conversation.title;
   },
   computed: {
-    username: function() {
-      return this.$store.getters.getUser.displayName;
+    name: function() {
+      return this.$store.getters.getUser.name;
     },
     isMulti: function() {
       return this.conversation.members.length > 2;
     },
     isOwner: function() {
-      return (
-        this.conversation.creator === this.$store.getters.getUser.displayName
-      );
+      return this.conversation.creator === this.$store.getters.getUser.name;
     },
     isRecipients: function() {
       return this.conversation.members.length > 1;
@@ -100,7 +98,7 @@ import UserSelector from "@/components/chat/UserSelector.vue";
       this.$emit("updateRecipients", recipients);
     },
     getOthers: function(members) {
-      return members ? members.filter(m => m.username !== this.username) : [];
+      return members ? members.filter(m => m.username !== this.name) : [];
     },
     autoTitle: function(c) {
       let auto = this.getOthers(c.members)

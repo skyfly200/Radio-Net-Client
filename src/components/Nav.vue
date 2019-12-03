@@ -9,7 +9,7 @@
             v-list-item-content
               .welcome
                 span Welcome&nbsp;
-                router-link(to='/profile') {{ username }}
+                router-link(to='/profile') {{ name }}
           v-divider
           v-list-item(@click='signout')
             v-list-item-action
@@ -70,7 +70,7 @@
           .controls.pt-3
             .welcome
               span Welcome&nbsp;
-              router-link(to='/profile') {{ username }}
+              router-link(to='/profile') {{ name }}
             .logout
               v-btn(text small @click='signout') Logout
         template(v-else)
@@ -97,8 +97,8 @@ export default {
     user() {
       return this.$store.getters.getUser;
     },
-    username() {
-      return this.$store.getters.getUser.displayName;
+    name() {
+      return this.$store.getters.getUser.name;
     }
   },
   methods: {
