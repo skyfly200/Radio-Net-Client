@@ -163,8 +163,14 @@ export default class Chat extends VuexModule {
     this.contacts = contacts;
   }
 
-  @Mutation set_conversation(conversation: Conversation) {
-    this.conversations[index] = conversation;
+  @Mutation set_messages(payload: { id: number; data: object }) {
+    let index = this.conversations.findIndex(c => payload.id === c.id);
+    this.conversations[index].messages = payload.data;
+  }
+
+  @Mutation set_conversation(payload: { id: number; data: object }) {
+    let index = this.conversations.findIndex(c => payload.id === c.id);
+    this.conversations[index] = payload.data;
   }
 
   @Action({ commit: "set_contacts" }) load_contacts() {
@@ -231,11 +237,35 @@ export default class Chat extends VuexModule {
   }
 
   @Action async load_conversations() {
-    // get users conversations with axios here using await
     var query = firebase
       .firestore()
       .collection("chats")
-      .doc("public")
+      .limit(12);
+
+    let t = this;
+    query
+      .get()
+      .then(function(querySnapshot) {
+        querySnapshot.forEach(function(doc) {
+          // doc.data() is never undefined for query doc snapshots
+          t.context.commit("set_conversation", {
+            id: doc.id,
+            data: new Conversation(doc.data())
+          });
+          console.log(doc.id, " => ", doc.data());
+        });
+      })
+      .catch(function(error) {
+        console.log("Error getting documents: ", error);
+      });
+  }
+
+  @Action async listen(id: string) {
+    let chatID = id ? id : "public";
+    var query = firebase
+      .firestore()
+      .collection("chats")
+      .doc(chatID)
       .collection("messages")
       .orderBy("timestamp")
       .limit(12);

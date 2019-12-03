@@ -3,12 +3,7 @@
     <v-layout row wrap>
       <v-flex class="mx-5">
         <v-form ref="form" v-model="valid" lazy-validation>
-          <v-text-field
-            v-model="email"
-            :rules="emailRules"
-            label="E-mail"
-            required
-          ></v-text-field>
+          <v-text-field v-model="email" :rules="emailRules" label="E-mail" required></v-text-field>
 
           <v-text-field
             v-model="password"
@@ -20,16 +15,10 @@
             @click:append="passwordShow = !passwordShow"
           ></v-text-field>
 
-          <v-btn :disabled="!valid" color="success" @click="validate">
-            Login
-          </v-btn>
+          <v-btn :disabled="!valid" color="success" @click="validate">Login</v-btn>
 
-          <v-btn color="error" @click="reset">
-            Reset Form
-          </v-btn>
-          <v-alert class="ma-4" v-if="status === 'failure'" type="error">
-            {{ error }}
-          </v-alert>
+          <v-btn color="error" @click="reset">Reset Form</v-btn>
+          <v-alert class="ma-4" v-if="status === 'failure'" type="error">{{ error }}</v-alert>
         </v-form>
         <div class="pt-6">
           <span>or</span>
@@ -84,7 +73,12 @@ export default {
         email: this.email,
         password: this.password
       };
-      this.$store.dispatch("signInAction", user);
+      this.$store.dispatch("signInAction", user).then(() => {
+        let path = this.$route.params.redirect
+          ? this.$route.params.redirect
+          : "dashboard";
+        this.$router.push(path);
+      });
     }
   }
 };

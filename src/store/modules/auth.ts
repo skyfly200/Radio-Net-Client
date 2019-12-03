@@ -50,31 +50,6 @@ export default class Auth extends VuexModule {
   }
 
   @Action({ rawError: true })
-  async signInAction(payload: { email: string; password: string }) {
-    let t = this;
-    await firebase
-      .auth()
-      .signInWithEmailAndPassword(payload.email, payload.password)
-      .then(response => {
-        router.push("dashboard");
-        t.context.commit("setAuth", {
-          status: "success",
-          user: response.user,
-          token: null,
-          error: null
-        });
-      })
-      .catch(error => {
-        t.context.commit("setAuth", {
-          status: "failure",
-          user: null,
-          token: null,
-          error: error.message
-        });
-      });
-  }
-
-  @Action({ rawError: true })
   async signOutAction() {
     let t = this;
     t.context.commit("setAuth", {
@@ -100,37 +75,68 @@ export default class Auth extends VuexModule {
   }
 
   @Action({ rawError: true })
-  async signUpAction(payload: { email: string; password: string }) {
+  signUpAction(payload: { email: string; password: string }) {
     this.context.commit("setStatus", "loading");
     this.context.commit("setProvider", "email");
     let t = this;
-    firebase
-      .auth()
-      .createUserWithEmailAndPassword(payload.email, payload.password)
-      .then(response => {
-        router.push("dashboard");
-        t.context.commit("setAuth", {
-          status: "success",
-          token: null,
-          user: response.user,
-          error: null
+    return new Promise((resolve, reject) => {
+      firebase
+        .auth()
+        .createUserWithEmailAndPassword(payload.email, payload.password)
+        .then(response => {
+          t.context.commit("setAuth", {
+            status: "success",
+            token: null,
+            user: response.user,
+            error: null
+          });
+          resolve();
+        })
+        .catch(error => {
+          t.context.commit("setAuth", {
+            status: "failure",
+            token: null,
+            user: null,
+            error: error.message
+          });
+          reject();
         });
-      })
-      .catch(error => {
-        t.context.commit("setAuth", {
-          status: "failure",
-          token: null,
-          user: null,
-          error: error.message
-        });
-      });
+    });
   }
 
   @Action({ rawError: true })
-  async providerSignIn(p: string) {
+  signInAction(payload: { email: string; password: string }) {
+    let t = this;
+    return new Promise((resolve, reject) => {
+      firebase
+        .auth()
+        .signInWithEmailAndPassword(payload.email, payload.password)
+        .then(response => {
+          t.context.commit("setAuth", {
+            status: "success",
+            user: response.user,
+            token: null,
+            error: null
+          });
+          resolve();
+        })
+        .catch(error => {
+          t.context.commit("setAuth", {
+            status: "failure",
+            user: null,
+            token: null,
+            error: error.message
+          });
+          reject();
+        });
+    });
+  }
+
+  @Action({ rawError: true })
+  providerSignIn(p: string) {
     this.context.commit("setStatus", "loading");
     this.context.commit("setProvider", p);
-    var provider;
+    var provider: any;
     switch (p) {
       case "fb":
         provider = new firebase.auth.FacebookAuthProvider();
@@ -143,35 +149,40 @@ export default class Auth extends VuexModule {
         break;
     }
     let t = this;
-    await firebase
-      .auth()
-      .signInWithPopup(provider)
-      .then(function(result) {
-        if (result.user) {
-          router.push("dashboard");
-          t.context.commit("setAuth", {
-            status: "success",
-            user: result.user,
-            token: result.credential.accessToken,
-            error: null
-          });
-        } else {
+    return new Promise((resolve, reject) => {
+      firebase
+        .auth()
+        .signInWithPopup(provider)
+        .then(function(result) {
+          if (result.user) {
+            router.push("dashboard");
+            t.context.commit("setAuth", {
+              status: "success",
+              user: result.user,
+              token: result.credential.accessToken,
+              error: null
+            });
+            resolve();
+          } else {
+            t.context.commit("setAuth", {
+              status: "failure",
+              token: null,
+              user: null,
+              error: ""
+            });
+            reject();
+          }
+        })
+        .catch(function(error: any) {
           t.context.commit("setAuth", {
             status: "failure",
-            token: null,
             user: null,
-            error: ""
+            token: null,
+            error: error.message
           });
-        }
-      })
-      .catch(function(error: any) {
-        return {
-          status: "failure",
-          user: null,
-          token: null,
-          error: error.message
-        };
-      });
+          reject();
+        });
+    });
   }
 
   get isLoggedIn() {

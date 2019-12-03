@@ -15,7 +15,12 @@
 export default {
   methods: {
     signIn(provider) {
-      this.$store.dispatch("providerSignIn", provider);
+      this.$store.dispatch("providerSignIn", provider).then(() => {
+        let path = this.$route.params.redirect
+          ? this.$route.params.redirect
+          : "dashboard";
+        this.$router.push(path);
+      });
     }
   }
 };
