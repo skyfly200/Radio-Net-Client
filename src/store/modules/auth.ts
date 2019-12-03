@@ -16,7 +16,7 @@ export default class Auth extends VuexModule {
   token: string | null = null;
   provider: string | null = null;
   raw: object | null = null;
-  user: User | null = new User();
+  user: User | null = null;
   error: string | null = null;
 
   @Mutation
@@ -69,7 +69,7 @@ export default class Auth extends VuexModule {
           status: "failure",
           token: null,
           user: null,
-          error: error.message
+          error: error
         });
       });
   }
@@ -97,7 +97,7 @@ export default class Auth extends VuexModule {
             status: "failure",
             token: null,
             user: null,
-            error: error.message
+            error: error
           });
           reject();
         });
@@ -125,9 +125,9 @@ export default class Auth extends VuexModule {
             status: "failure",
             user: null,
             token: null,
-            error: error.message
+            error: error
           });
-          reject();
+          reject(error);
         });
     });
   }
@@ -155,7 +155,6 @@ export default class Auth extends VuexModule {
         .signInWithPopup(provider)
         .then(function(result) {
           if (result.user) {
-            router.push("dashboard");
             t.context.commit("setAuth", {
               status: "success",
               user: result.user,
@@ -178,7 +177,7 @@ export default class Auth extends VuexModule {
             status: "failure",
             user: null,
             token: null,
-            error: error.message
+            error: error
           });
           reject();
         });
@@ -189,7 +188,7 @@ export default class Auth extends VuexModule {
     return !!this.raw;
   }
   get getUser() {
-    return this.raw;
+    return this.user;
   }
   get getStatus() {
     return this.status;

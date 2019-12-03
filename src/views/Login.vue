@@ -18,7 +18,7 @@
           <v-btn :disabled="!valid" color="success" @click="validate">Login</v-btn>
 
           <v-btn color="error" @click="reset">Reset Form</v-btn>
-          <v-alert class="ma-4" v-if="status === 'failure'" type="error">{{ error }}</v-alert>
+          <v-alert class="ma-4" v-if="alert" type="error">{{ alert }}</v-alert>
         </v-form>
         <div class="pt-6">
           <span>or</span>
@@ -50,6 +50,7 @@ export default {
     passwordShow: false,
     valid: true,
     email: "",
+    alert: "",
     emailRules: [
       v => !!v || "E-mail is required",
       v => /.+@.+/.test(v) || "E-mail must be valid"
@@ -60,8 +61,6 @@ export default {
   methods: {
     validate() {
       if (this.$refs.form.validate()) {
-        this.error = "";
-        this.snackbar = true;
         this.loginWithFirebase();
       }
     },
@@ -73,12 +72,29 @@ export default {
         email: this.email,
         password: this.password
       };
-      this.$store.dispatch("signInAction", user).then(() => {
-        let path = this.$route.params.redirect
-          ? this.$route.params.redirect
-          : "dashboard";
-        this.$router.push(path);
-      });
+      this.$store
+        .dispatch("signInAction", user)
+        .then(() => {
+          let path = this.$route.query.redirect
+            ? this.$route.query.redirect
+            : "dashboard";
+          this.$router.push(path);
+        })
+        .catch(error => {
+          switch (error.code) {
+            case "auth/user-not-found":
+              this.alert = "No record matches that email.";
+              break;
+            case "auth/wrong-password":
+              this.alert = "Incorect password provided.";
+              break;
+            case "auth/too-many-requests":
+              this.alert = "Too many invalid attempts. Please try again later.";
+              break;
+            default:
+              console.error(error);
+          }
+        });
     }
   }
 };

@@ -58,7 +58,6 @@ export default {
   },
   data: () => ({
     passwordShow: false,
-    confirmPasswordShow: false,
     valid: true,
     email: "",
     emailRules: [
@@ -67,7 +66,10 @@ export default {
     ],
     password: "",
     confirmPassword: "",
-    passwordRules: [v => !!v || "Password Required"]
+    passwordRules: [
+      v => !!v || "Password Required",
+      v => v === this.confirmPassword || "Passwords must match"
+    ]
   }),
   methods: {
     registerWithEmail() {
@@ -77,17 +79,15 @@ export default {
       };
       // pass this.$route.params.redirect as a param to redirect to
       this.$store.dispatch("signUpAction", user).then(() => {
-        let path = this.$route.params.redirect
-          ? this.$route.params.redirect
+        let path = this.$route.query.redirect
+          ? this.$route.query.redirect
           : "dashboard";
         this.$router.push(path);
       });
     },
     validate() {
       if (this.$refs.form.validate()) {
-        this.error = "";
         this.registerWithEmail();
-        this.snackbar = true;
       }
     },
     reset() {
