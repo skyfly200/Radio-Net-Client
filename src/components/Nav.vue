@@ -5,7 +5,7 @@
         template(avatar v-if='userLoggedIn')
           v-list-item
             v-list-item-avatar
-              v-img(:src="user.photoURL")
+              v-img(:src="img")
             v-list-item-content
               .welcome
                 span Welcome&nbsp;
@@ -61,7 +61,7 @@
       #user
         template(v-if='userLoggedIn')
           .user-img
-            v-img(:src="user.photoURL" width="40")
+            v-img(:src="img" width="40")
           .controls.pt-3
             .welcome
               span Welcome&nbsp;
@@ -93,6 +93,12 @@ export default {
     },
     name() {
       return this.$store.getters.getUser.name;
+    },
+    img() {
+      let user = this.$store.getters.getUser;
+      return user.photoURL
+        ? user.photoURL
+        : "http://lorempixel.com/g/200/200/cats/1";
     }
   },
   methods: {
