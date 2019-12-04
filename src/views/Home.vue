@@ -10,22 +10,26 @@
     v-row
       v-col(center)
         v-card.ma-6
-          v-card-title Project is still in alpha stage development
+          v-card-title 
+            h3 Project is still in alpha stage development!
           v-card-subtitle
-            p This means there will be things that are buggy or broken. Feel free to let me know by submitting issue on the github page for ths project
-            v-btn(href="").ma-4
+            p This means there will be things that are buggy or broken. Feel free to report them by submitting issue on the github page for this project and we will work on them as time allows.
+            v-btn(href="https://github.com/skyfly200/Radio-Net-Client" target="new").ma-4
               v-icon mdi-github
               span Project on Github
+            p If you would like to contribute to this projects development plase email us at 
+              a(href="mailto:wayhighradio@gmail.com") wayhighradio@gmail.com
             v-alert(type="error") This release is solely for preview purposes, don't store anything you would not want to lose on here. Features may also change and your data may not be saved properly. Data may be deleted or become unaccesable without notice! You have been warned!
           v-divider
-          v-card-action
+          v-card-action.pa-4
             template(v-if="subscribed")
-              h2 Thanks for signing up!
+              h3 Thanks for signing up!
             template(v-else)
-              h2 Subscribe for email updates on our progress towards beta and beyond
+              h3 Subscribe for email updates on our progress towards beta and beyond
               p We will not spam your inbox and we promise not to give your email to anyone.
-              v-text-field(v-model="email" label="Email")
-              v-btn Subscribe
+              v-form(v-model="valid").ma-4
+                v-text-field(v-model="email" :rules="emailRules" solo required label="Email")
+                v-btn(:disabled="!valid" @click="") Subscribe
     v-row
       v-col(center)
         v-card.ma-6(center)
@@ -67,7 +71,12 @@
 export default {
   components: {},
   data: () => ({
+    valid: true,
     email: "",
+    emailRules: [
+      v => !!v || "E-mail is required",
+      v => /.+@.+\..+/.test(v) || "E-mail must be valid"
+    ],
     subscribed: false
   })
 };
