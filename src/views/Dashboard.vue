@@ -1,7 +1,7 @@
 <template lang="pug">
 v-container(fluid).dashboard
   v-layout.heading
-    h1 Welcome to the dashboard {{ username }}
+    h1 Welcome to the dashboard {{ name }}
   v-divider
   v-layout(row).body
     v-flex(shrink).links.card
@@ -23,27 +23,26 @@ v-container(fluid).dashboard
         v-card-title
           h3 Account Setting
         v-card-text
-          EditableField(title="Username" :v="username" icon="mdi-account").account-field.username
+          EditableField(@edit="changeName($event)" title="Display Name" :v="name" icon="mdi-account").account-field.username
           v-divider
-          EditableField(title="Email" :v="email" icon="mdi-email").account-field.email
-          v-divider
-          EditableField(title="Phone" :v="phone" icon="mdi-phone").account-field.phone
+          EditableField(@edit="changeEmail($event)" title="Email" :v="email" icon="mdi-email").account-field.email
           v-divider
           br
-          v-btn(primary to="/password").password-btn
+          v-btn(primary @click="").password-btn
             v-icon(left) mdi-lock
             span Change Password
 </template>
 
 <script>
 import { Component, Vue } from "vue-property-decorator";
+import firebase from "firebase";
 import EditableField from "@/components/EditableField.vue";
 
 @Component({
   components: { EditableField },
   data: () => ({
-    email: "user@example.com",
-    phone: "720-555-5555",
+    email: "",
+    name: "",
     photo: "",
     userId: "",
     user: {}
@@ -51,37 +50,35 @@ import EditableField from "@/components/EditableField.vue";
   created() {
     this.user = this.$store.getters.getUser;
     if (this.user) {
-      this.name = this.user.displayName;
+      this.name = this.user.name;
       this.email = this.user.email;
-      this.phone = this.user.phoneNumber;
       this.photo = this.user.photoURL;
       this.userId = this.user.uid;
     }
   },
-  computed: {
-    userLoggedIn() {
-      return this.$store.getters.getUser;
-    },
-    username() {
-      return this.$store.getters.getUser.displayName;
-    }
-  },
   methods: {
-    getUser: function(username) {
-      this.$http({
-        url: "http://localhost:1234/users/profile/" + username,
-        data: { username: username },
-        method: "GET"
-      })
-        .then(resp => {
-          if (resp.data.err) {
-            console.error(resp.data.err);
-          } else {
-            this.user = resp.data;
-          }
+    changeName(name) {
+      this.name = name;
+      var user = firebase.auth().currentUser;
+      user
+        .updateProfile({ displayName: name })
+        .then(function() {
+          // Update successful.
         })
-        .catch(err => {
-          console.error(err);
+        .catch(function(error) {
+          // An error happened.
+        });
+    },
+    changeEmail(email) {
+      this.email = email;
+      var user = firebase.auth().currentUser;
+      user
+        .updateEmail(email)
+        .then(function() {
+          // Update successful.
+        })
+        .catch(function(error) {
+          // An error happened.
         });
     }
   }

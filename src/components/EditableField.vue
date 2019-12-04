@@ -3,15 +3,16 @@
   .view(v-if="!editing")
     .field-value
       h3 {{ title }}:&nbsp;
+      v-spacer
       span {{ value }}
     v-spacer
-    EditBtn(@select="edit" :tooltip="{text: 'Change Username', left: true}").edit-btn
+    EditBtn(@select="edit" :tooltip="{text: 'Edit Value', left: true}").edit-btn
   v-form.edit(v-else)
     .field-edit
-      v-text-area(v-if="textarea" :name="title" :label="title" :value="value")
-      v-text-field(v-else :prepend-icon="icon" :name="title" :label="title" :value="value")
+      v-text-area(v-if="textarea" :name="title" :label="title" v-model="value")
+      v-text-field(v-else :prepend-icon="icon" :name="title" :label="title" v-model="value")
     v-btn(@click="editing = false") Cancel
-    v-btn(@click="") Save
+    v-btn(@click="save") Save
 </template>
 <script>
 import { Component, Vue } from "vue-property-decorator";
@@ -31,7 +32,10 @@ import EditBtn from "@/components/EditBtn.vue";
     edit: function() {
       this.editing = true;
     },
-    save: function() {}
+    save: function() {
+      this.editing = false;
+      this.$emit("edit", this.value);
+    }
   }
 })
 export default class EditableField extends Vue {}
