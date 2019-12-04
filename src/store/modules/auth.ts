@@ -62,7 +62,7 @@ export default class Auth extends VuexModule {
       .auth()
       .signOut()
       .then(response => {
-        router.push("login");
+        router.push("auth");
       })
       .catch(error => {
         t.context.commit("setAuth", {
@@ -86,7 +86,7 @@ export default class Auth extends VuexModule {
             user: user,
             error: null
           });
-          resolve();
+          resolve(true);
         } else {
           t.context.commit("setAuth", {
             status: "success",
@@ -94,7 +94,7 @@ export default class Auth extends VuexModule {
             user: null,
             error: null
           });
-          resolve();
+          resolve(false);
         }
       });
     });
@@ -125,13 +125,15 @@ export default class Auth extends VuexModule {
             user: null,
             error: error
           });
-          reject();
+          reject(error);
         });
     });
   }
 
   @Action({ rawError: true })
   signInAction(payload: { email: string; password: string }) {
+    this.context.commit("setStatus", "loading");
+    this.context.commit("setProvider", "email");
     let t = this;
     return new Promise((resolve, reject) => {
       firebase
@@ -184,34 +186,38 @@ export default class Auth extends VuexModule {
             t.context.commit("setAuth", {
               status: "success",
               user: result.user,
-              token: result.credential.accessToken,
+              token: result.credential ? result.credential.accessToken : null,
               error: null
             });
             resolve();
           } else {
-            t.context.commit("setAuth", {
-              status: "failure",
-              token: null,
-              user: null,
-              error: ""
-            });
-            reject();
+            t.context
+              .commit("setAuth", {
+                status: "failure",
+                token: null,
+                user: null,
+                error: ""
+              })
+              .catch(error => {
+                console.error(error);
+              });
+            reject(null);
           }
         })
-        .catch(function(error: any) {
+        .catch((error: any) => {
           t.context.commit("setAuth", {
             status: "failure",
             user: null,
             token: null,
             error: error
           });
-          reject();
+          reject(error);
         });
     });
   }
 
   get isLoggedIn() {
-    return firebase.auth().currentUser;
+    return !!this.raw;
   }
   get getUser() {
     return this.user;

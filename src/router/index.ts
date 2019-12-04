@@ -17,15 +17,9 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ "@/views/About.vue")
   },
   {
-    path: "/register/:redirect?",
-    name: "register",
-    component: () =>
-      import(/* webpackChunkName: "register" */ "@/views/Register.vue")
-  },
-  {
-    path: "/login/:redirect?",
-    name: "login",
-    component: () => import(/* webpackChunkName: "login" */ "@/views/Login.vue")
+    path: "/auth",
+    name: "auth",
+    component: () => import(/* webpackChunkName: "auth" */ "@/views/Auth.vue")
   },
   {
     path: "/dashboard",
@@ -120,7 +114,7 @@ router.beforeEach((to, from, next) => {
     let auth = store.getters.isLoggedIn;
     if (!auth) {
       next({
-        path: "/login",
+        path: "/auth",
         query: { redirect: to.fullPath }
       });
     } else {

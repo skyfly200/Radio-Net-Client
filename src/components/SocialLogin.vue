@@ -13,14 +13,32 @@
 </template>
 <script>
 export default {
-  methods: {
-    signIn(provider) {
-      this.$store.dispatch("providerSignIn", provider).then(() => {
+  mounted() {
+    this.$store
+      .dispatch("syncAuth")
+      .then(flag => {
         let path = this.$route.query.redirect
           ? this.$route.query.redirect
           : "dashboard";
-        this.$router.push(path);
+        if (flag) this.$router.push(path);
+      })
+      .catch(error => {
+        console.error(error);
       });
+  },
+  methods: {
+    signIn(provider) {
+      this.$store
+        .dispatch("providerSignIn", provider)
+        .then(() => {
+          let path = this.$route.query.redirect
+            ? this.$route.query.redirect
+            : "dashboard";
+          this.$router.push(path);
+        })
+        .catch(error => {
+          console.error(error);
+        });
     }
   }
 };

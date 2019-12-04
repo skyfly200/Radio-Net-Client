@@ -17,16 +17,11 @@
             v-list-item-content
               v-list-item-title Logout
         template(v-else)
-          v-list-item(to='/login')
+          v-list-item(to='/auth')
             v-list-item-action
               v-icon mdi-login-variant
             v-list-item-content
               v-list-item-title Login
-          v-list-item(to='/register')
-            v-list-item-action
-              v-icon mdi-account-plus
-            v-list-item-content
-              v-list-item-title Register
         v-divider
         v-list-item(to='/')
           v-list-item-action
@@ -74,8 +69,7 @@
             .logout
               v-btn(text small @click='signout') Logout
         template(v-else)
-          v-btn(text to='/login') Login
-          v-btn(text to='/register') Register
+          v-btn(text to='/auth') Login
       template(v-slot:extension)
         StreamPlayer
 </template>
