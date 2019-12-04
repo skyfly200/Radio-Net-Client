@@ -11,8 +11,8 @@ v-container(fluid grid-list-md).profile
             ImgEditHover(profile="true" :editable="ownProfile" v-on:open="openImageDialog('profile')" width='200px' src='http://lorempixel.com/200/200/abstract')
           .profile-info
             h1 {{ titleCase(user.name) }}
-            h3 Joined: {{ dateJoined }}
-            h3 Last Login: {{ lastLogin }}
+            h3(v-if="ownProfile") Joined: {{ dateJoined }}
+            h3(v-if="ownProfile") Last Login: {{ lastLogin }}
     v-flex.sections
       v-card.bio.section(color='grey lighten-4')
         v-card-title
@@ -115,12 +115,11 @@ import ImgEditHover from "@/components/ImgEditHover.vue";
     dateJoined: function() {
       let joined = this.$store.getters.getJoined;
       let date = new Date(joined);
-      console.log(joined);
       return this.fullTimestampFormat(date);
     },
     lastLogin: function() {
       let last = this.$store.getters.getLastLogin;
-      let date = new Date();
+      let date = new Date(last);
       return this.fullTimestampFormat(date);
     },
     ownProfile: function() {
@@ -132,67 +131,22 @@ import ImgEditHover from "@/components/ImgEditHover.vue";
       this.imageDialog = true;
       this.imageDialogType = type;
     },
-    monthFormat: function(d) {
-      let date = new Date(d);
-      return format(d, "LLLL");
-    },
-    dateFormat: function(d) {
-      let date = new Date(d);
-      return format(d, "LLLL do");
-    },
     fullDateFormat: function(d) {
       return format(d, "LLLL do y");
     },
-    timeFormat: function(d) {
-      let date = new Date(d);
-      return format(d, "HH:mm");
-    },
-    preciseTimeFormat: function(d) {
-      let date = new Date(d);
-      return format(d, "HH:mm:ss.SSSxxx");
-    },
-    timestampFormat: function(d) {
-      let date = new Date(d);
-      return format(d, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
-    },
     fullTimestampFormat: function(d) {
       return format(d, "PPpp");
-    },
-    dayName: function(date) {
-      const days = [
-        "Sunday",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday"
-      ];
-      return days[date.getDay()];
-    },
-    monthName: function(date) {
-      const months = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December"
-      ];
-      return months[date.getMonth()];
     },
     titleCase: function(string) {
       if (string) return string.charAt(0).toUpperCase() + string.slice(1);
       else return "";
     },
     getProfile: function(username) {
-      this.user = this.$store.getters.getUser;
+      this.user = this.ownProfile
+        ? this.$store.getters.getUser
+        : {
+            name: username
+          };
 
       this.user.groups = [
         {

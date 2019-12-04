@@ -16,10 +16,10 @@ v-container(fluid grid-list-md).groups
           p Has {{ group.members }} members
         v-card-actions
           v-spacer
-          v-btn(:to="'/group/' + group.title" flat) Visit
+          v-btn(:to="'/group/' + group.title" text) Visit
     v-flex.new-group
       h3 Don't see what your looking for?
-      v-btn(@click="" color="primary") Create a New Group
+      v-btn(@click="createGroup" color="primary") Create a New Group
 </template>
 
 <script>
@@ -29,7 +29,12 @@ import { Component, Vue } from "vue-property-decorator";
   data: () => ({
     query: "",
     groups: [
-      {title: "test", img: "http://lorempixel.com/800/200/nature", created: new Date(), members: 2}
+      {
+        title: "test",
+        img: "http://lorempixel.com/800/200/nature",
+        created: new Date(),
+        members: 2
+      }
     ]
   }),
   methods: {
@@ -59,6 +64,7 @@ import { Component, Vue } from "vue-property-decorator";
       if (string) return string.charAt(0).toUpperCase() + string.slice(1);
       else return "";
     },
+    createGroup: function() {}
   }
 })
 export default class Groups extends Vue {}

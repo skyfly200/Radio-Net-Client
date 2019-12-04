@@ -13,20 +13,18 @@ v-container(fluid grid-list-md).group
             h1 {{ titleCase(title) }}
             h3 Created: {{ dateCreated }}
             .link-icons
-              v-btn(v-if="group.website" flat icon href="group.website" target="blank")
-                v-icon public
-              v-btn(v-if="group.stream" flat icon :href="group.stream" target="blank")
-                v-icon headset
-              v-btn(v-if="group.social.facebook" flat icon :href="'https://www.facebook.com/' + group.social.facebook" target="blank")
-                v-icon share
+              v-btn(v-if="group.website" text icon href="group.website" target="blank")
+                v-icon mdi-earth
+              v-btn(v-if="group.social.facebook" text icon :href="'https://www.facebook.com/' + group.social.facebook" target="blank")
+                v-icon mdi-share
         v-card-actions
           v-spacer
           .group-actions
             v-btn(@click="" color="primary")
-              v-icon(left) person_add
+              v-icon(left) mdi-account-multiple-plus
               | Join
             v-btn(@click="" color="primary")
-              v-icon(left) notifications
+              v-icon(left) mdi-bell
               | Follow
     v-flex.sections
       v-card.bio.section(color='grey lighten-4')
@@ -91,6 +89,8 @@ v-container(fluid grid-list-md).group
 
 <script>
 import { Component, Vue } from "vue-property-decorator";
+import { format } from "date-fns";
+
 import ImgUpload from "@/components/ImgUpload.vue";
 import ImgEditHover from "@/components/ImgEditHover.vue";
 
@@ -105,18 +105,30 @@ import ImgEditHover from "@/components/ImgEditHover.vue";
         facebook: "skyfly"
       },
       info: [
-        {title: "location", value: "Boulder, CO"},
-        {title: "type", value: "Meetup"},
-        {title: "topic", value: "Web Dev"}
+        { title: "location", value: "Boulder, CO" },
+        { title: "type", value: "Meetup" },
+        { title: "topic", value: "Web Dev" }
       ],
       members: [
-        { name: "Supreme Leader", username: "test", role: "admin", joined: new Date(), img: "http://lorempixel.com/200/200/animals/0"},
-        { name: "Skyler", username: "skyfly", role: "user", joined: new Date(), img: "http://lorempixel.com/200/200/animals/1"}
+        {
+          name: "Supreme Leader",
+          username: "test",
+          role: "admin",
+          joined: new Date(),
+          img: "http://lorempixel.com/200/200/animals/0"
+        },
+        {
+          name: "Skyler",
+          username: "skyfly",
+          role: "user",
+          joined: new Date(),
+          img: "http://lorempixel.com/200/200/animals/1"
+        }
       ],
       images: [
-        {src: "http://lorempixel.com/200/200/nature/0"},
-        {src: "http://lorempixel.com/200/200/nature/1"},
-        {src: "http://lorempixel.com/200/200/nature/2"}
+        { src: "http://lorempixel.com/200/200/nature/0" },
+        { src: "http://lorempixel.com/200/200/nature/1" },
+        { src: "http://lorempixel.com/200/200/nature/2" }
       ],
       activity: []
     },
@@ -146,7 +158,9 @@ import ImgEditHover from "@/components/ImgEditHover.vue";
     isGroupAdmin: function() {
       // check if current user is a group admin
       let groups = this.$store.getters.getUser.groups;
-      return groups && groups[this.title].role === "admin";
+      return (
+        groups && groups[this.title] && groups[this.title].role === "admin"
+      );
     }
   },
   methods: {
@@ -156,45 +170,13 @@ import ImgEditHover from "@/components/ImgEditHover.vue";
     },
     dateFormat: function(d) {
       let date = new Date(d);
-      return this.monthFormat(date) + " " + date.getFullYear();
-    },
-    monthFormat: function(date) {
-      const months = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December"
-      ];
-      return months[date.getMonth()];
+      return format(date, "PPpp");
     },
     titleCase: function(string) {
       if (string) return string.charAt(0).toUpperCase() + string.slice(1);
       else return "";
     },
-    getGroup: function(title) {
-      this.$http({
-        url: "http://localhost:1234/groups/" + title,
-        method: "GET"
-      })
-        .then(resp => {
-          if (resp.data.err) {
-            console.error(resp.data.err);
-          } else {
-            this.group = resp.data;
-          }
-        })
-        .catch(err => {
-          console.error(err);
-        });
-    }
+    getGroup: function(title) {}
   }
 })
 export default class Group extends Vue {}

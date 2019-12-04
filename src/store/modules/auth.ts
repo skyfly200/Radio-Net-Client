@@ -75,6 +75,32 @@ export default class Auth extends VuexModule {
   }
 
   @Action({ rawError: true })
+  syncAuth() {
+    let t = this;
+    return new Promise((resolve, reject) => {
+      firebase.auth().onAuthStateChanged(function(user: any) {
+        if (user) {
+          t.context.commit("setAuth", {
+            status: "success",
+            token: null,
+            user: user,
+            error: null
+          });
+          resolve();
+        } else {
+          t.context.commit("setAuth", {
+            status: "success",
+            token: null,
+            user: null,
+            error: null
+          });
+          resolve();
+        }
+      });
+    });
+  }
+
+  @Action({ rawError: true })
   signUpAction(payload: { email: string; password: string }) {
     this.context.commit("setStatus", "loading");
     this.context.commit("setProvider", "email");
@@ -185,7 +211,7 @@ export default class Auth extends VuexModule {
   }
 
   get isLoggedIn() {
-    return !!this.raw;
+    return firebase.auth().currentUser;
   }
   get getUser() {
     return this.user;
