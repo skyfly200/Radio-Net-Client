@@ -1,14 +1,14 @@
 <template lang="pug">
 v-container(fluid grid-list-md).profile
   ImgUpload(:type="imageDialogType" @done="console.log($event)" @close="imageDialog = false" :toggle="imageDialog" :multi="false")
-  v-layout.layout
+  v-layout.layout(v-if="status === 'ready'")
     v-flex.heading
       v-card(color='grey lighten-4')
         .header-image
           ImgEditHover(:editable="ownProfile" v-on:open="openImageDialog('header')" :src="headerImg")
         .header-body
           .profile-image
-            ImgEditHover(profile="true" :editable="ownProfile" v-on:open="openImageDialog('profile')" width='200px' :src="img")
+            ImgEditHover(profile="true" :editable="ownProfile" v-on:open="openImageDialog('profile')" width='200px' :src="profileImg")
           .profile-info
             h1 {{ titleCase(user.name) }}
             h3(v-if="ownProfile") Joined: {{ dateJoined }}
@@ -75,6 +75,13 @@ v-container(fluid grid-list-md).profile
                 v-card-text
                   h4 {{ event.type }}
                   p {{ event.details }}
+  v-layout(v-else-if="status === 'missing'")
+    v-flex
+      v-card(color='grey lighten-4')
+        h1 The user {{ username }} doesn't exist
+  v-layout(v-else-if="status === 'loading'")
+    v-flex
+        v-progress-circular.loading.ma-6(indeterminate)
 </template>
 
 <script>
@@ -92,10 +99,12 @@ var db = firebase.firestore();
   data: () => ({
     user: {},
     username: "",
+    status: "loading",
     imageDialogType: "",
     imageDialog: false,
     imgUpload: "",
-    headerImg: "http://lorempixel.com/800/200/abstract/1",
+    profileImg: "",
+    headerImg: "",
     edit: {
       info: false,
       bio: false
@@ -114,7 +123,6 @@ var db = firebase.firestore();
       ? this.$route.params.username
       : this.$store.getters.getUser.name;
     this.getProfile(this.username);
-    if (this.ownProfile) this.syncProfile();
   },
   computed: {
     dateJoined: function() {
@@ -129,23 +137,9 @@ var db = firebase.firestore();
     },
     ownProfile: function() {
       return !this.$route.params.username;
-    },
-    img() {
-      let user = this.$store.getters.getUser;
-      return user && user.photoURL
-        ? user.photoURL
-        : "http://lorempixel.com/g/200/200/cats/1";
     }
   },
   methods: {
-    syncProfile() {
-      db.collection("users")
-        .doc(this.$store.getters.getUser.uid)
-        .onSnapshot(function(doc) {
-          var source = doc.metadata.hasPendingWrites ? "Local" : "Server";
-          console.log(source, " data: ", doc.data());
-        });
-    },
     openImageDialog: function(type) {
       this.imageDialog = true;
       this.imageDialogType = type;
@@ -162,22 +156,25 @@ var db = firebase.firestore();
     },
     getProfile: function(username) {
       let query = db.collection("users").where("name", "==", username);
+      let t = this;
       query
         .get()
         .then(function(querySnapshot) {
-          querySnapshot.forEach(function(doc) {
-            console.log(doc.id, " => ", doc.data());
-          });
+          if (!querySnapshot.empty) {
+            let data = {};
+            querySnapshot.forEach(function(doc) {
+              data = doc.data();
+            });
+            t.user = data;
+            t.profileImg = data.profileImg;
+            t.headerImg = data.headerImg;
+          } else {
+            t.status = "missing";
+          }
         })
         .catch(function(error) {
           console.log("Error getting user profle: ", error);
         });
-
-      this.user = this.ownProfile
-        ? this.$store.getters.getUser
-        : {
-            name: username
-          };
 
       this.user.groups = [
         {
@@ -208,6 +205,7 @@ var db = firebase.firestore();
       ];
       this.user.bio =
         "This is the users bio section. It can be customized to serve as an introduction for other users visiting their profile page.";
+      this.status = "ready";
     }
   }
 })
