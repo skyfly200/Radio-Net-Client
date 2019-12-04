@@ -66,12 +66,12 @@
             p An automatic and seamless podcasting platform
             p Syndication and distribution of shows is a few clicks away
             p Explore past shows by your favorite DJs, or see recent shows on you local station
-        v-btn(to="auth" large color="primary").mt-7 Sign Up
+        v-btn(to="auth" large color="primary").ma-7 Sign Up
+        br
+        br
 </template>
 <script>
 import firebase from "firebase";
-
-var db = firebase.firestore();
 
 export default {
   components: {},
@@ -88,6 +88,7 @@ export default {
   methods: {
     subscribe() {
       let t = this;
+      var db = firebase.firestore();
       db.collection("newsletter")
         .add({
           email: this.email,
