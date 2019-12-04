@@ -21,15 +21,16 @@
               a(href="mailto:wayhighradio@gmail.com") wayhighradio@gmail.com
             v-alert(type="error") This release is solely for preview purposes, don't store anything you would not want to lose on here. Features may also change and your data may not be saved properly. Data may be deleted or become unaccesable without notice! You have been warned!
           v-divider
-          v-card-action.pa-4
+          v-card-actions.pa-4
             template(v-if="subscribed")
               h3 Thanks for signing up!
             template(v-else)
-              h3 Subscribe for email updates on our progress towards beta and beyond
-              p We will not spam your inbox and we promise not to give your email to anyone.
               v-form(v-model="valid").ma-4
+                h3.ma-2 Subscribe for email updates on our progress towards beta and beyond
+                v-text-field(v-model="name" solo required label="Name")
                 v-text-field(v-model="email" :rules="emailRules" solo required label="Email")
-                v-btn(:disabled="!valid" @click="") Subscribe
+                p We promise not to spam your inbox or give your email to anyone.
+                v-btn(:disabled="!valid" @click="subscribe") Subscribe
     v-row
       v-col(center)
         v-card.ma-6(center)
@@ -68,16 +69,37 @@
         v-btn(to="auth" large color="primary").mt-7 Sign Up
 </template>
 <script>
+import firebase from "firebase";
+
+var db = firebase.firestore();
+
 export default {
   components: {},
   data: () => ({
     valid: true,
+    name: "",
     email: "",
     emailRules: [
       v => !!v || "E-mail is required",
       v => /.+@.+\..+/.test(v) || "E-mail must be valid"
     ],
     subscribed: false
-  })
+  }),
+  methods: {
+    subscribe() {
+      let t = this;
+      db.collection("newsletter")
+        .add({
+          email: this.email,
+          name: this.name
+        })
+        .then(function() {
+          t.subscribed = true;
+        })
+        .catch(function(error) {
+          console.error("Error writing document: ", error);
+        });
+    }
+  }
 };
 </script>
