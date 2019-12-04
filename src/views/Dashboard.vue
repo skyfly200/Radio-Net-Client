@@ -38,6 +38,8 @@ import { Component, Vue } from "vue-property-decorator";
 import firebase from "firebase";
 import EditableField from "@/components/EditableField.vue";
 
+var db = firebase.firestore();
+
 @Component({
   components: { EditableField },
   data: () => ({
@@ -68,6 +70,18 @@ import EditableField from "@/components/EditableField.vue";
         .catch(function(error) {
           // An error happened.
         });
+      // update in firestore
+      db.collection("users")
+        .doc(user.uid)
+        .update({
+          name: name
+        })
+        .then(function() {
+          console.log("Name updated succesfuly!");
+        })
+        .catch(function(error) {
+          console.error("Error updating name: ", error);
+        });
     },
     changeEmail(email) {
       this.email = email;
@@ -79,6 +93,18 @@ import EditableField from "@/components/EditableField.vue";
         })
         .catch(function(error) {
           // An error happened.
+        });
+      // update in firestore
+      db.collection("users")
+        .doc(user.uid)
+        .update({
+          email: email
+        })
+        .then(function() {
+          console.log("Email updated succesfuly!");
+        })
+        .catch(function(error) {
+          console.error("Error updating email: ", error);
         });
     }
   }

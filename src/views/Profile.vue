@@ -5,10 +5,10 @@ v-container(fluid grid-list-md).profile
     v-flex.heading
       v-card(color='grey lighten-4')
         .header-image
-          ImgEditHover(:editable="ownProfile" v-on:open="openImageDialog('header')" src='http://lorempixel.com/800/200/abstract')
+          ImgEditHover(:editable="ownProfile" v-on:open="openImageDialog('header')" :src="headerImg")
         .header-body
           .profile-image
-            ImgEditHover(profile="true" :editable="ownProfile" v-on:open="openImageDialog('profile')" width='200px' src='http://lorempixel.com/200/200/abstract')
+            ImgEditHover(profile="true" :editable="ownProfile" v-on:open="openImageDialog('profile')" width='200px' :src="img")
           .profile-info
             h1 {{ titleCase(user.name) }}
             h3(v-if="ownProfile") Joined: {{ dateJoined }}
@@ -80,9 +80,12 @@ v-container(fluid grid-list-md).profile
 <script>
 import { Component, Vue } from "vue-property-decorator";
 import { format } from "date-fns";
+import firebase from "firebase";
 
 import ImgUpload from "@/components/ImgUpload.vue";
 import ImgEditHover from "@/components/ImgEditHover.vue";
+
+var db = firebase.firestore();
 
 @Component({
   components: { ImgUpload, ImgEditHover },
@@ -92,6 +95,7 @@ import ImgEditHover from "@/components/ImgEditHover.vue";
     imageDialogType: "",
     imageDialog: false,
     imgUpload: "",
+    headerImg: "http://lorempixel.com/800/200/abstract/1",
     edit: {
       info: false,
       bio: false
@@ -110,6 +114,7 @@ import ImgEditHover from "@/components/ImgEditHover.vue";
       ? this.$route.params.username
       : this.$store.getters.getUser.name;
     this.getProfile(this.username);
+    if (this.ownProfile) this.syncProfile();
   },
   computed: {
     dateJoined: function() {
@@ -124,9 +129,23 @@ import ImgEditHover from "@/components/ImgEditHover.vue";
     },
     ownProfile: function() {
       return !this.$route.params.username;
+    },
+    img() {
+      let user = this.$store.getters.getUser;
+      return user && user.photoURL
+        ? user.photoURL
+        : "http://lorempixel.com/g/200/200/cats/1";
     }
   },
   methods: {
+    syncProfile() {
+      db.collection("users")
+        .doc(this.$store.getters.getUser.uid)
+        .onSnapshot(function(doc) {
+          var source = doc.metadata.hasPendingWrites ? "Local" : "Server";
+          console.log(source, " data: ", doc.data());
+        });
+    },
     openImageDialog: function(type) {
       this.imageDialog = true;
       this.imageDialogType = type;
@@ -142,6 +161,18 @@ import ImgEditHover from "@/components/ImgEditHover.vue";
       else return "";
     },
     getProfile: function(username) {
+      let query = db.collection("users").where("name", "==", username);
+      query
+        .get()
+        .then(function(querySnapshot) {
+          querySnapshot.forEach(function(doc) {
+            console.log(doc.id, " => ", doc.data());
+          });
+        })
+        .catch(function(error) {
+          console.log("Error getting user profle: ", error);
+        });
+
       this.user = this.ownProfile
         ? this.$store.getters.getUser
         : {
