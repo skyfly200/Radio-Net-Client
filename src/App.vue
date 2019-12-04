@@ -2,7 +2,9 @@
   <v-app id="app">
     <Nav />
     <v-content>
-      <router-view></router-view>
+      <v-container fluid>
+        <router-view></router-view>
+      </v-container>
     </v-content>
     <ChatBar v-if="showChat" />
   </v-app>
