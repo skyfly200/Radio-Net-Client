@@ -193,6 +193,14 @@ export default class Auth extends VuexModule {
   get getStatus() {
     return this.status;
   }
+  get getJoined() {
+    let raw: any = this.raw;
+    return raw ? raw.metadata.creationTime : null;
+  }
+  get getLastLogin() {
+    let raw: any = this.raw;
+    return raw ? raw.metadata.lastSignInTime : null;
+  }
   get getError() {
     return this.error;
   }

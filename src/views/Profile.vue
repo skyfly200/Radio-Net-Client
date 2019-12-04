@@ -11,8 +11,8 @@ v-container(fluid grid-list-md).profile
             ImgEditHover(profile="true" :editable="ownProfile" v-on:open="openImageDialog('profile')" width='200px' src='http://lorempixel.com/200/200/abstract')
           .profile-info
             h1 {{ titleCase(user.name) }}
-            h3 Username: {{ username }}
             h3 Joined: {{ dateJoined }}
+            h3 Last Login: {{ lastLogin }}
     v-flex.sections
       v-card.bio.section(color='grey lighten-4')
         v-card-title
@@ -28,7 +28,7 @@ v-container(fluid grid-list-md).profile
         v-card-actions(v-if="ownProfile && !edit.bio")
           v-spacer
           v-btn(@click="edit.bio = true" fab dark small color="primary")
-            v-icon edit
+            v-icon mdi-pencil
       v-card.fields.section(color='grey lighten-4')
         v-card-title
           h2 Profile Info
@@ -46,20 +46,21 @@ v-container(fluid grid-list-md).profile
         v-card-actions(v-if="ownProfile && !edit.info")
           v-spacer
           v-btn(@click="edit.info = true" fab dark small color="primary")
-            v-icon edit
+            v-icon mdi-pencil
       v-card.groups.section(v-if="user.groups !== undefined && user.groups.length" color='grey lighten-4')
         v-card-title
           h2 Groups
         v-card-text
           v-list.groups-list
-            v-list-tile.group(v-for="group in user.groups")
-              v-list-tile-avatar
+            v-list-item.group(v-for="group in user.groups")
+              v-list-item-avatar
                 v-img(:src="group.img")
-              v-list-tile-content
-                v-list-tile-title {{ titleCase(group.title) }}
-                v-list-tile-sub-title {{ group.role }}
-              v-list-tile-action
-                v-btn(:to="'/group/' + group.title" flat small) Visit
+              v-list-item-content
+                v-list-item-title
+                  h2 {{ titleCase(group.title) }}
+                  h3 {{ group.role }}
+              v-list-item-action
+                v-btn(:to="'/group/' + group.title" text small) Visit
       v-card.activity.section(v-if="user.activity !== undefined && user.activity.length" color='grey lighten-4')
         v-card-title
           h2 Recent Activity
@@ -78,6 +79,8 @@ v-container(fluid grid-list-md).profile
 
 <script>
 import { Component, Vue } from "vue-property-decorator";
+import { format } from "date-fns";
+
 import ImgUpload from "@/components/ImgUpload.vue";
 import ImgEditHover from "@/components/ImgEditHover.vue";
 
@@ -98,20 +101,27 @@ import ImgEditHover from "@/components/ImgEditHover.vue";
     $route(to, from) {
       this.username = this.$route.params.username
         ? this.$route.params.username
-        : this.$store.getters.getUser.username;
+        : this.$store.getters.getUser.name;
       this.getProfile(this.username);
     }
   },
   created() {
     this.username = this.$route.params.username
       ? this.$route.params.username
-      : this.$store.getters.getUser.username;
+      : this.$store.getters.getUser.name;
     this.getProfile(this.username);
   },
   computed: {
     dateJoined: function() {
-      let date = new Date(this.user.joined);
-      return this.fullDateFormat(date);
+      let joined = this.$store.getters.getJoined;
+      let date = new Date(joined);
+      console.log(joined);
+      return this.fullTimestampFormat(date);
+    },
+    lastLogin: function() {
+      let last = this.$store.getters.getLastLogin;
+      let date = new Date();
+      return this.fullTimestampFormat(date);
     },
     ownProfile: function() {
       return !this.$route.params.username;
@@ -124,38 +134,39 @@ import ImgEditHover from "@/components/ImgEditHover.vue";
     },
     monthFormat: function(d) {
       let date = new Date(d);
-      return this.monthName(date) + " " + date.getFullYear();
+      return format(d, "LLLL");
     },
     dateFormat: function(d) {
       let date = new Date(d);
-      return  date.getDate() + " " + this.monthFormat(d);
+      return format(d, "LLLL do");
     },
     fullDateFormat: function(d) {
-      return this.dayName(d) + " " + this.dateFormat(d);
+      return format(d, "LLLL do y");
     },
     timeFormat: function(d) {
       let date = new Date(d);
-      return date.getHours() + ":" + date.getMinutes();
+      return format(d, "HH:mm");
     },
     preciseTimeFormat: function(d) {
       let date = new Date(d);
-      return this.timeFormat(d) + ":" + date.getSeconds();
+      return format(d, "HH:mm:ss.SSSxxx");
     },
     timestampFormat: function(d) {
-      return this.timeFormat(d) + " " + this.dateFormat(d);
+      let date = new Date(d);
+      return format(d, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
     },
     fullTimestampFormat: function(d) {
-      return this.timeFormat(d) + " " + this.fullDateFormat(d);
+      return format(d, "PPpp");
     },
     dayName: function(date) {
-      const days= [
+      const days = [
         "Sunday",
         "Monday",
         "Tuesday",
         "Wednesday",
         "Thursday",
         "Friday",
-        "Saturday",
+        "Saturday"
       ];
       return days[date.getDay()];
     },
@@ -181,30 +192,37 @@ import ImgEditHover from "@/components/ImgEditHover.vue";
       else return "";
     },
     getProfile: function(username) {
-      this.$http({
-        url: "http://localhost:1234/users/profile/" + username,
-        data: { username: username },
-        method: "GET"
-      })
-        .then(resp => {
-          if (resp.data.err) {
-            console.error(resp.data.err);
-          } else {
-            this.user = resp.data;
-            this.user.groups = [
-              {title: "test", role: "admin", img: "http://lorempixel.com/200/200/nature"}
-            ];
-            this.user.activity = [
-              {title: "Event 1", time: new Date("4/29/19"), type: "Test", details: "Test Event 1"},
-              {title: "Event 2", time: new Date("4/27/19"), type: "Test", details: "Test Event 2"},
-              {title: "Event 3", time: new Date("4/22/19"), type: "Test", details: "Test Event 3"}
-            ];
-            this.user.bio = "This is the users bio section. It can be customized to serve as an introduction for other users visiting their profile page."
-          }
-        })
-        .catch(err => {
-          console.error(err);
-        });
+      this.user = this.$store.getters.getUser;
+
+      this.user.groups = [
+        {
+          title: "test",
+          role: "admin",
+          img: "http://lorempixel.com/200/200/nature"
+        }
+      ];
+      this.user.activity = [
+        {
+          title: "Event 1",
+          time: new Date("4/29/19"),
+          type: "Test",
+          details: "Test Event 1"
+        },
+        {
+          title: "Event 2",
+          time: new Date("4/27/19"),
+          type: "Test",
+          details: "Test Event 2"
+        },
+        {
+          title: "Event 3",
+          time: new Date("4/22/19"),
+          type: "Test",
+          details: "Test Event 3"
+        }
+      ];
+      this.user.bio =
+        "This is the users bio section. It can be customized to serve as an introduction for other users visiting their profile page.";
     }
   }
 })

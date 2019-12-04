@@ -5,7 +5,7 @@ v-hover
       v-expand-transition(v-if="editable")
         .d-flex.transition-fast-in-fast-out.black.v-card--reveal.display-3(v-if='hover' style='height: 100%;')
           .chip-spacer(@click="$emit('open')")
-            v-chip(outline color="white").edit-img-chip
+            v-chip(outlined color="white").edit-img-chip
               v-avatar
                 v-icon.edit-img mdi-camera
               | Edit

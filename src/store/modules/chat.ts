@@ -159,33 +159,18 @@ export default class Chat extends VuexModule {
     }
   ].map(c => new Contact(c));
 
+  // Mutations
   @Mutation set_contacts(contacts: Array<Contact>) {
     this.contacts = contacts;
   }
-
   @Mutation set_messages(payload: { id: number; data: object }) {
     let index = this.conversations.findIndex(c => payload.id === c.id);
     this.conversations[index].messages = payload.data;
   }
-
   @Mutation set_conversation(payload: { id: number; data: object }) {
     let index = this.conversations.findIndex(c => payload.id === c.id);
     this.conversations[index] = payload.data;
   }
-
-  @Action({ commit: "set_contacts" }) load_contacts() {
-    return [new Contact()];
-  }
-
-  get getContacts() {
-    return this.contacts;
-  }
-  get getContact() {
-    return (username: string) => {
-      return this.contacts.find(c => c.username === username);
-    };
-  }
-
   @Mutation new_conversation(conversation: Conversation) {
     this.conversations.unshift(conversation);
   }
@@ -236,6 +221,8 @@ export default class Chat extends VuexModule {
     }
   }
 
+  // Actions
+
   @Action async load_conversations() {
     var query = firebase
       .firestore()
@@ -259,7 +246,9 @@ export default class Chat extends VuexModule {
         console.log("Error getting documents: ", error);
       });
   }
-
+  @Action({ commit: "set_contacts" }) load_contacts() {
+    return [new Contact()];
+  }
   @Action async listen(id: string) {
     let chatID = id ? id : "public";
     var query = firebase
@@ -286,7 +275,6 @@ export default class Chat extends VuexModule {
       t.context.commit("set_conversation", messages);
     });
   }
-
   @Action({ commit: "set_active_conversation" }) async select_conversation(
     id: number
   ) {
@@ -317,37 +305,7 @@ export default class Chat extends VuexModule {
     return data;
   }
 
-  // Socket.io Event Listener Actions
-  @Action({ commit: "new_conversation" }) socket_new_conversation(
-    conversation: Object
-  ) {
-    return new Conversation(conversation);
-  }
-  @Action({ commit: "new_message" }) socket_new_message(message: object) {
-    return new Message(message);
-  }
-  @Action({ commit: "set_convo_prop" }) socket_conversation_updated(
-    id: Number,
-    property: string,
-    value: string | boolean | object
-  ) {
-    return new PropUpdate({
-      id: id,
-      property: property,
-      value: value
-    });
-  }
-  @Action({ commit: "update_recipients" }) socket_update_recipients(data: {
-    id: number;
-    recipients: Array<Contact>;
-  }) {
-    return { id: data.id, recipients: data.recipients };
-  }
-  @Action({ commit: "deactivate_conversation" })
-  socket_removed_from_conversation(id: number) {
-    //(vm as any).$socket.emit("unsubscribe", id);
-    return id;
-  }
+  // Getters
 
   get activeID() {
     return this.active;
@@ -361,6 +319,14 @@ export default class Chat extends VuexModule {
   get getConversation() {
     return (id: Number) => {
       return this.conversations.find((c: Conversation) => c.id === id);
+    };
+  }
+  get getContacts() {
+    return this.contacts;
+  }
+  get getContact() {
+    return (username: string) => {
+      return this.contacts.find(c => c.username === username);
     };
   }
 }

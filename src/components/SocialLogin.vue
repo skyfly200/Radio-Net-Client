@@ -19,7 +19,6 @@ export default {
         let path = this.$route.query.redirect
           ? this.$route.query.redirect
           : "dashboard";
-        console.log(path);
         this.$router.push(path);
       });
     }
