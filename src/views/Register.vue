@@ -20,7 +20,7 @@
             label="Confirm Password"
             :rules="passwordRules"
             required
-            :append-icon="confirmPasswordShow ? 'mdi-eye' : 'mdi-eye-off'"
+            :append-icon="passwordShow ? 'mdi-eye' : 'mdi-eye-off'"
             :type="passwordShow ? 'text' : 'password'"
             @click:append="passwordShow = !passwordShow"
           ></v-text-field>
@@ -28,7 +28,7 @@
           <v-btn :disabled="!valid" color="success" @click="validate">Register</v-btn>
 
           <v-btn color="error" @click="reset">Reset Form</v-btn>
-          <v-alert class="ma-4" v-if="status === 'failure'" type="error">{{ error }}</v-alert>
+          <v-alert class="ma-4" v-if="alert" type="error">{{ alert }}</v-alert>
         </v-form>
         <div class="pt-6">
           <span>or</span>
@@ -54,22 +54,23 @@ export default {
     },
     status() {
       return this.$store.getters.status;
+    },
+    passwordsMatch() {
+      return this.password === this.confirmPassword;
     }
   },
   data: () => ({
     passwordShow: false,
     valid: true,
     email: "",
+    alert: "",
     emailRules: [
       v => !!v || "E-mail is required",
       v => /.+@.+/.test(v) || "E-mail must be valid"
     ],
     password: "",
     confirmPassword: "",
-    passwordRules: [
-      v => !!v || "Password Required",
-      v => v === this.confirmPassword || "Passwords must match"
-    ]
+    passwordRules: [v => !!v || "Password Required"]
   }),
   methods: {
     registerWithEmail() {
@@ -87,7 +88,8 @@ export default {
     },
     validate() {
       if (this.$refs.form.validate()) {
-        this.registerWithEmail();
+        if (this.passwordsMatch) this.registerWithEmail();
+        else this.alert = "passwords do not match";
       }
     },
     reset() {
