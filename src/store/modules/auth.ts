@@ -101,10 +101,11 @@ export default class Auth extends VuexModule {
   }
 
   @Action({ rawError: true })
-  signUpAction(payload: { email: string; password: string }) {
+  signUpAction(payload: { email: string; password: string; name: string }) {
     this.context.commit("setStatus", "loading");
     this.context.commit("setProvider", "email");
     let t = this;
+    var db = firebase.firestore();
     return new Promise((resolve, reject) => {
       firebase
         .auth()
@@ -116,7 +117,24 @@ export default class Auth extends VuexModule {
             user: response.user,
             error: null
           });
-          resolve();
+          db.collection("users")
+            .doc(response.user.uid)
+            .update({
+              name: payload.name
+            })
+            .catch(function(error) {
+              console.error("Error updating name in firestore: ", error);
+            });
+          var user = firebase.auth().currentUser;
+          user
+            .updateProfile({ displayName: payload.name })
+            .then(() => {
+              resolve();
+            })
+            .catch(function(error) {
+              console.error("Error updating name in user properties: ", error);
+              resolve();
+            });
         })
         .catch(error => {
           t.context.commit("setAuth", {

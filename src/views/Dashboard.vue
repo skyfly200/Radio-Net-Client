@@ -62,14 +62,9 @@ var db = firebase.firestore();
     changeName(name) {
       this.name = name;
       var user = firebase.auth().currentUser;
-      user
-        .updateProfile({ displayName: name })
-        .then(function() {
-          // Update successful.
-        })
-        .catch(function(error) {
-          // An error happened.
-        });
+      user.updateProfile({ displayName: name }).catch(function(error) {
+        // An error happened.
+      });
       // update in firestore
       db.collection("users")
         .doc(user.uid)

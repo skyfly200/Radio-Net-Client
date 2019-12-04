@@ -3,6 +3,7 @@
     <v-layout row wrap>
       <v-flex class="mx-5">
         <v-form v-if="register" ref="form" v-model="valid" lazy-validation>
+          <v-text-field v-model="name" label="Display Name" required></v-text-field>
           <v-text-field v-model="email" :rules="emailRules" label="E-mail" required></v-text-field>
 
           <v-text-field
@@ -85,8 +86,9 @@ export default {
     register: false,
     passwordShow: false,
     valid: true,
-    email: "",
     alert: "",
+    name: "",
+    email: "",
     emailRules: [
       v => !!v || "E-mail is required",
       v => /.+@.+/.test(v) || "E-mail must be valid"
@@ -107,6 +109,7 @@ export default {
         email: this.email,
         password: this.password
       };
+      if (this.register) user.name = this.name;
       let action = this.register ? "signUpAction" : "signInAction";
       this.$store
         .dispatch(action, user)
@@ -129,6 +132,9 @@ export default {
               break;
             case "auth/weak-password":
               this.alert = "Too weak of a password.";
+              break;
+            case "auth/invalid-email":
+              this.alert = "Invalid email address.";
               break;
             case "auth/email-already-in-use":
               this.alert =
