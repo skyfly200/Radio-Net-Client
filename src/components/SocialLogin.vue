@@ -13,19 +13,6 @@
 </template>
 <script>
 export default {
-  mounted() {
-    this.$store
-      .dispatch("syncAuth")
-      .then(flag => {
-        let path = this.$route.query.redirect
-          ? this.$route.query.redirect
-          : "dashboard";
-        if (flag) this.$router.push(path);
-      })
-      .catch(error => {
-        console.error(error);
-      });
-  },
   methods: {
     signIn(provider) {
       this.$store

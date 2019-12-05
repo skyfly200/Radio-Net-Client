@@ -62,7 +62,7 @@ export default class Auth extends VuexModule {
       .auth()
       .signOut()
       .then(response => {
-        router.push("auth");
+        if (router.currentRoute.name !== "auth") router.push("auth");
       })
       .catch(error => {
         t.context.commit("setAuth", {
@@ -209,16 +209,12 @@ export default class Auth extends VuexModule {
             });
             resolve();
           } else {
-            t.context
-              .commit("setAuth", {
-                status: "failure",
-                token: null,
-                user: null,
-                error: ""
-              })
-              .catch(error => {
-                console.error(error);
-              });
+            t.context.commit("setAuth", {
+              status: "failure",
+              token: null,
+              user: null,
+              error: ""
+            });
             reject(null);
           }
         })
