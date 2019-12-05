@@ -92,7 +92,8 @@ export default {
       db.collection("newsletter")
         .add({
           email: this.email,
-          name: this.name
+          name: this.name,
+          subscribedAt: firebase.firestore.FieldValue.serverTimestamp()
         })
         .then(function() {
           t.subscribed = true;
