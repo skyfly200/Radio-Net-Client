@@ -35,6 +35,7 @@ v-dialog(v-model="toggle" max-width="1000").image-upload-dialog
 </template>
 <script>
 import { Component, Vue } from "vue-property-decorator";
+import firebase from "firebase";
 
 @Component({
   props: ["type", "toggle", "multi"],
@@ -65,6 +66,9 @@ import { Component, Vue } from "vue-property-decorator";
   computed: {
     noFiles: function() {
       return this.files.length < 1;
+    },
+    uid: function() {
+      return this.$store.getters.getUID;
     }
   },
   methods: {
@@ -197,41 +201,46 @@ import { Component, Vue } from "vue-property-decorator";
       this.message = "";
     },
     upload: function() {
-      // || REFRENCE || File API, Axios, Vuetify Loader
       // upload selected files and show progress
       this.uploading = true;
       this.error = false;
       this.message = "";
-      let formData = new FormData();
-      for (var i = 0; i < this.files.length; i++) {
-        formData.append("files[" + i + "]", this.files[i]);
-      }
-      this.$http({
-        url: "http://localhost:1234/images/" + this.type,
-        data: formData,
-        method: "POST",
-        headers: { "Content-Type": "multipart/form-data" },
-        onUploadProgress: function(progressEvent) {
-          this.uploadPercentage = parseInt(
-            Math.round((progressEvent.loaded * 100) / progressEvent.total)
-          );
-        }.bind(this)
-      })
-        .then(
-          function(resp) {
-            // emit done event, passing the upload response & clear data
-            this.$emit("done", resp);
+      var path = "images/" + this.type + "-" + this.uid + ".jpg";
+      var storage = firebase.storage();
+      var imageRef = storage.ref().child(path);
+
+      // todo checkfiles are in array
+
+      var uploadTask = imageRef.put(this.files[0]);
+
+      uploadTask.on(
+        "state_changed",
+        function(snapshot) {
+          var progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          this.uploadPercentage = progress;
+          switch (snapshot.state) {
+            case firebase.storage.TaskState.PAUSED: // or 'paused'
+              this.message = "Upload is paused";
+              break;
+            case firebase.storage.TaskState.RUNNING: // or 'running'
+              this.message = "Upload is running";
+              break;
+          }
+        }.bind(this),
+        function(error) {
+          // Display upload Error message
+          this.uploading = false;
+          this.message = error;
+          this.error = true;
+        }.bind(this),
+        function() {
+          uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+            this.$emit("done", downloadURL);
             this.clear();
-          }.bind(this)
-        )
-        .catch(
-          function(error) {
-            // Display upload Error message
-            this.uploading = false;
-            this.message = error;
-            this.error = true;
-          }.bind(this)
-        );
+          }.bind(this));
+        }.bind(this)
+      );
     },
     closeDialog: function() {
       this.$emit("close");

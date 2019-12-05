@@ -1,6 +1,6 @@
 <template lang="pug">
 v-container(fluid grid-list-md).profile
-  ImgUpload(:type="imageDialogType" @done="console.log($event)" @close="imageDialog = false" :toggle="imageDialog" :multi="false")
+  ImgUpload(:type="imageDialogType" @done="updateImg($event)" @close="imageDialog = false" :toggle="imageDialog" :multi="false")
   v-layout.layout(v-if="status === 'ready'")
     v-flex.heading
       v-card(color='grey lighten-4')
@@ -61,7 +61,7 @@ v-container(fluid grid-list-md).profile
                   h3 {{ group.role }}
               v-list-item-action
                 v-btn(:to="'/group/' + group.title" text small) Visit
-          h3(v-else) User has no group memberships
+          h3(v-else) User has no memberships
       v-card.activity.section(color='grey lighten-4')
         v-card-title
           h2 Activity
@@ -76,7 +76,7 @@ v-container(fluid grid-list-md).profile
                 v-card-text
                   h4 {{ event.type }}
                   p {{ event.details }}
-          h3(v-else) User has no group memberships
+          h3(v-else) User has no activity
   v-layout(v-else-if="status === 'missing'")
     v-flex
       v-card(color='grey lighten-4')
@@ -144,6 +144,13 @@ var db = firebase.firestore();
     }
   },
   methods: {
+    updateImg: function(url) {
+      let map = { profile: "profileImg", header: "headerImg" };
+      this.imageDialog = false;
+      this.user[map[this.imageDialogType]] = url;
+      // save new img url to firestore
+      this.save(map[this.imageDialogType]);
+    },
     openImageDialog: function(type) {
       this.imageDialog = true;
       this.imageDialogType = type;
