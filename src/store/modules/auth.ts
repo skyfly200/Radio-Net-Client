@@ -240,6 +240,9 @@ export default class Auth extends VuexModule {
   get getUser() {
     return this.user;
   }
+  get getUID() {
+    return this.raw.uid;
+  }
   get getStatus() {
     return this.status;
   }

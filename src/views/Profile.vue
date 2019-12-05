@@ -5,10 +5,10 @@ v-container(fluid grid-list-md).profile
     v-flex.heading
       v-card(color='grey lighten-4')
         .header-image
-          ImgEditHover(:editable="ownProfile" v-on:open="openImageDialog('header')" :src="headerImg")
+          ImgEditHover(:editable="ownProfile" v-on:open="openImageDialog('header')" :src="user.headerImg")
         .header-body
           .profile-image
-            ImgEditHover(profile="true" :editable="ownProfile" v-on:open="openImageDialog('profile')" width='200px' :src="profileImg")
+            ImgEditHover(profile="true" :editable="ownProfile" v-on:open="openImageDialog('profile')" width='200px' :src="user.profileImg")
           .profile-info
             h1 {{ titleCase(user.name) }}
             h3(v-if="ownProfile") Joined: {{ dateJoined }}
@@ -22,9 +22,9 @@ v-container(fluid grid-list-md).profile
             p {{ user.bio }}
           .section-edit(v-else)
             v-form
-              v-textarea(name="bio" label="Bio" :value="user.bio")
+              v-textarea(name="bio" label="Bio" v-model="user.bio")
               v-btn(@click="edit.bio = false") Cancel
-              v-btn(@click="") Save
+              v-btn(@click="save('bio')") Save
         v-card-actions(v-if="ownProfile && !edit.bio")
           v-spacer
           v-btn(@click="edit.bio = true" fab dark small color="primary")
@@ -33,25 +33,25 @@ v-container(fluid grid-list-md).profile
         v-card-title
           h2 Profile Info
         v-card-text
-          .section-view(v-if="!edit.info")
+          .section-view(v-if="!edit.profile")
             .field(v-for="field in user.profile")
               h3 {{ field.title }}: {{ field.value }}
               br
           .section-edit(v-else)
             v-form
-              .field-edit(v-for="field in user.profile")
-                v-text-field(:name="field.title" :label="field.title" :value="field.value")
-              v-btn(@click="edit.info = false") Cancel
-              v-btn(@click="") Save
-        v-card-actions(v-if="ownProfile && !edit.info")
+              .field-edit(v-for="(field,i) in user.profile" :key="i")
+                v-text-field(:name="field.title" :label="field.title" v-model="user.profile[i].value")
+              v-btn(@click="edit.profile = false") Cancel
+              v-btn(@click="save('profile')") Save
+        v-card-actions(v-if="ownProfile && !edit.profile")
           v-spacer
-          v-btn(@click="edit.info = true" fab dark small color="primary")
+          v-btn(@click="edit.profile = true" fab dark small color="primary")
             v-icon mdi-pencil
-      v-card.groups.section(v-if="user.groups !== undefined && user.groups.length" color='grey lighten-4')
+      v-card.groups.section(color='grey lighten-4')
         v-card-title
           h2 Groups
         v-card-text
-          v-list.groups-list
+          v-list.groups-list(v-if="user.groups !== undefined && user.groups.length")
             v-list-item.group(v-for="group in user.groups")
               v-list-item-avatar
                 v-img(:src="group.img")
@@ -61,11 +61,12 @@ v-container(fluid grid-list-md).profile
                   h3 {{ group.role }}
               v-list-item-action
                 v-btn(:to="'/group/' + group.title" text small) Visit
-      v-card.activity.section(v-if="user.activity !== undefined && user.activity.length" color='grey lighten-4')
+          h3(v-else) User has no group memberships
+      v-card.activity.section(color='grey lighten-4')
         v-card-title
-          h2 Recent Activity
+          h2 Activity
         v-card-text
-          v-timeline
+          v-timeline(v-if="user.activity !== undefined && user.activity.length")
             v-timeline-item.event(v-for="event in user.activity")
               template(v-slot:opposite)
                 h4 {{ fullDateFormat(event.time) }}
@@ -75,6 +76,7 @@ v-container(fluid grid-list-md).profile
                 v-card-text
                   h4 {{ event.type }}
                   p {{ event.details }}
+          h3(v-else) User has no group memberships
   v-layout(v-else-if="status === 'missing'")
     v-flex
       v-card(color='grey lighten-4')
@@ -103,10 +105,9 @@ var db = firebase.firestore();
     imageDialogType: "",
     imageDialog: false,
     imgUpload: "",
-    profileImg: "",
-    headerImg: "",
+    saveStatus: null,
     edit: {
-      info: false,
+      profile: false,
       bio: false
     }
   }),
@@ -135,6 +136,9 @@ var db = firebase.firestore();
       let date = new Date(last);
       return this.fullTimestampFormat(date);
     },
+    uid: function() {
+      return this.$store.getters.getUID;
+    },
     ownProfile: function() {
       return !this.$route.params.username;
     }
@@ -154,6 +158,24 @@ var db = firebase.firestore();
       if (string) return string.charAt(0).toUpperCase() + string.slice(1);
       else return "";
     },
+    save: function(key) {
+      let query = db.collection("users").doc(this.uid);
+      let t = this;
+      t.saveStatus = "loading";
+      let data = {};
+      data[key] = this.user[key];
+      query
+        .update(data)
+        .then(() => {
+          t.saveStatus = "saved";
+          t.edit[key] = false;
+        })
+        .catch(error => {
+          t.saveStatus = "error";
+          t.edit[key] = false;
+          console.error(error);
+        });
+    },
     getProfile: function(username) {
       let query = db.collection("users").where("name", "==", username);
       let t = this;
@@ -166,8 +188,7 @@ var db = firebase.firestore();
               data = doc.data();
             });
             t.user = data;
-            t.profileImg = data.profileImg;
-            t.headerImg = data.headerImg;
+            t.status = "ready";
           } else {
             t.status = "missing";
           }
@@ -175,37 +196,6 @@ var db = firebase.firestore();
         .catch(function(error) {
           console.log("Error getting user profle: ", error);
         });
-
-      this.user.groups = [
-        {
-          title: "test",
-          role: "admin",
-          img: "http://lorempixel.com/200/200/nature"
-        }
-      ];
-      this.user.activity = [
-        {
-          title: "Event 1",
-          time: new Date("4/29/19"),
-          type: "Test",
-          details: "Test Event 1"
-        },
-        {
-          title: "Event 2",
-          time: new Date("4/27/19"),
-          type: "Test",
-          details: "Test Event 2"
-        },
-        {
-          title: "Event 3",
-          time: new Date("4/22/19"),
-          type: "Test",
-          details: "Test Event 3"
-        }
-      ];
-      this.user.bio =
-        "This is the users bio section. It can be customized to serve as an introduction for other users visiting their profile page.";
-      this.status = "ready";
     }
   }
 })
