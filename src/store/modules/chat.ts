@@ -19,38 +19,33 @@ function hasKey<O>(obj: O, key: string | number | symbol): key is keyof O {
 @Module
 export default class Chat extends VuexModule {
   active: number = new Date(2018, 11, 28).getTime();
-  conversations: Array<Conversation> = [
-    {
-      id: new Date(2018, 11, 28).getTime(),
-      unread: false,
-      active: true,
-      title: "The Group",
-      styles: {
-        color: "default",
-        density: "medium"
-      },
-      notifications: {
-        state: true
-      },
-      created: new Date(2018, 11, 28),
-      creator: "test",
-      members: [
-        {
-          username: "skyfly",
-          avatar: "https://cdn.vuetifyjs.com/images/lists/5.jpg"
-        }
-      ],
-      messages: [
-        { author: "test", body: "Another from you", timestamp: new Date() }
-      ]
-    }
-  ].map(c => new Conversation(c));
-  contacts: Array<Contact> = [
-    {
-      username: "test",
-      avatar: "https://cdn.vuetifyjs.com/images/lists/1.jpg"
-    }
-  ].map(c => new Contact(c));
+  contacts: Array<Contact> = [];
+  conversations: Array<Conversation> = [];
+  //   {
+  //     id: new Date(2018, 11, 28).getTime(),
+  //     unread: false,
+  //     active: true,
+  //     title: "The Group",
+  //     styles: {
+  //       color: "default",
+  //       density: "medium"
+  //     },
+  //     notifications: {
+  //       state: true
+  //     },
+  //     created: new Date(2018, 11, 28),
+  //     creator: "test",
+  //     members: [
+  //       {
+  //         username: "skyfly",
+  //         avatar: "https://cdn.vuetifyjs.com/images/lists/5.jpg"
+  //       }
+  //     ],
+  //     messages: [
+  //       { author: "test", body: "Another from you", timestamp: new Date() }
+  //     ]
+  //   }
+  // ].map(c => new Conversation(c));
 
   // Mutations
   @Mutation set_contacts(contacts: Array<Contact>) {
