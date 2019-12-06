@@ -12,22 +12,26 @@ v-container(fluid grid-list-md).chat
         @sendMessage="sendMessage($event)"
         @updateTitle="activeConvo.title = $event"
         @updateRecipients="updateRecipients($event)"
-        @leave=""
+        @leave="leaveConvo($event)"
         @delete="deleteConvo($event)")
 </template>
 
-<script>
+<script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
+import { format, isToday, isThisWeek, isThisYear, getTime } from "date-fns";
+import firebase from "firebase";
+
 import ConversationIndex from "@/components/chat/ConversationIndex.vue";
 import ConversationView from "@/components/chat/ConversationView.vue";
-// import date-fns utils
-import { format, isToday, isThisWeek, isThisYear, getTime } from "date-fns";
+
 // vuex stuff
 import { mapGetters } from "vuex";
 import { Conversation } from "@/models/conversation";
 import { Contact } from "@/models/contact";
 import { Message } from "@/models/message";
 import { PropUpdate } from "@/models/propUpdate";
+
+var db = firebase.firestore();
 
 @Component({
   components: { ConversationIndex, ConversationView },
@@ -45,7 +49,7 @@ import { PropUpdate } from "@/models/propUpdate";
       return this.conversations[0] && this.conversations[0].members.length <= 1;
     },
     username: function() {
-      return this.getUser.username;
+      return this.getUser.displayName;
     },
     ...mapGetters({
       getUser: "getUser",
@@ -57,25 +61,18 @@ import { PropUpdate } from "@/models/propUpdate";
       activeConvo: "getActiveConversation"
     })
   },
-  created() {
-    // for (var c of this.conversations) {
-    //   if (c.active) this.$socket.emit('subscribe', c.id);
-    // }
+  mounted() {
+    this.$store.dispatch("sync");
   },
   methods: {
     sendMessage: function(body) {
-      if (this.isFirst) {
-        pass;
-        //this.$socket.emit('start_conversation', this.activeConvo);
-      }
       if (this.isRecipients) {
         let message = {
           convoID: this.active,
-          author: this.username,
+          author: this.getUser ? this.username : "guest",
           body: body,
           timestamp: new Date()
         };
-        //this.$socket.emit('message', this.active, message);
         this.$store.dispatch("send_message", new Message(message));
       }
     },
@@ -115,6 +112,10 @@ import { PropUpdate } from "@/models/propUpdate";
     },
     deleteConvo: function(i) {
       this.$store.dispatch("delete_conversation", i);
+      // TO-DO remove coversation from users list
+    },
+    leaveConvo: function(i) {
+      this.$store.dispatch("leave_conversation", i);
     },
     updateRecipients: function(recipients) {
       let self = new Contact({
@@ -123,9 +124,7 @@ import { PropUpdate } from "@/models/propUpdate";
       });
       let allRecpients = recipients;
       allRecpients.push(self);
-      if (!this.isFirst)
-        //this.$socket.emit('set_recipients', allRecpients, this.activeConvo);
-        this.$store.dispatch("set_recipients", allRecpients);
+      if (!this.isFirst) this.$store.dispatch("set_recipients", allRecpients);
     }
   }
 })

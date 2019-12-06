@@ -38,101 +38,10 @@ export default class Chat extends VuexModule {
         {
           username: "skyfly",
           avatar: "https://cdn.vuetifyjs.com/images/lists/5.jpg"
-        },
-        {
-          username: "test",
-          avatar: "https://cdn.vuetifyjs.com/images/lists/1.jpg"
-        },
-        {
-          username: "test2",
-          avatar: "https://cdn.vuetifyjs.com/images/lists/2.jpg"
         }
       ],
       messages: [
-        {
-          author: "test2",
-          body: "This is a message from another user",
-          timestamp: new Date(2018, 11, 28)
-        },
-        {
-          author: "test",
-          body: "This is a message you sent",
-          timestamp: new Date(2019, 2, 22)
-        },
-        {
-          author: "test2",
-          body: "Another message from another user",
-          timestamp: new Date(2019, 3, 20)
-        },
         { author: "test", body: "Another from you", timestamp: new Date() }
-      ]
-    },
-    {
-      id: new Date(2019, 4, 3).getTime(),
-      unread: true,
-      active: true,
-      title: "",
-      styles: {
-        color: "default",
-        density: "medium"
-      },
-      notifications: {
-        state: true
-      },
-      created: new Date(2019, 4, 3),
-      creator: "test",
-      members: [
-        {
-          username: "skyfly",
-          avatar: "https://cdn.vuetifyjs.com/images/lists/5.jpg"
-        },
-        {
-          username: "test",
-          avatar: "https://cdn.vuetifyjs.com/images/lists/1.jpg"
-        }
-      ],
-      messages: [
-        {
-          author: "test",
-          body: "Hey, whats up?",
-          timestamp: new Date(2019, 4, 3)
-        }
-      ]
-    },
-    {
-      id: new Date(2019, 3, 3).getTime(),
-      unread: false,
-      active: true,
-      title: "",
-      styles: {
-        color: "default",
-        density: "medium"
-      },
-      notifications: {
-        state: true
-      },
-      created: new Date(2019, 3, 3),
-      creator: "test3",
-      members: [
-        {
-          username: "skyfly",
-          avatar: "https://cdn.vuetifyjs.com/images/lists/5.jpg"
-        },
-        {
-          username: "test",
-          avatar: "https://cdn.vuetifyjs.com/images/lists/1.jpg"
-        },
-        {
-          username: "test3",
-          avatar: "https://cdn.vuetifyjs.com/images/lists/1.jpg"
-        }
-      ],
-      messages: [
-        {
-          author: "test3",
-          body: "Hola amigos",
-          timestamp: new Date(2019, 4, 3)
-        }
       ]
     }
   ].map(c => new Conversation(c));
@@ -140,22 +49,6 @@ export default class Chat extends VuexModule {
     {
       username: "test",
       avatar: "https://cdn.vuetifyjs.com/images/lists/1.jpg"
-    },
-    {
-      username: "test2",
-      avatar: "https://cdn.vuetifyjs.com/images/lists/2.jpg"
-    },
-    {
-      username: "test3",
-      avatar: "https://cdn.vuetifyjs.com/images/lists/3.jpg"
-    },
-    {
-      username: "test4",
-      avatar: "https://cdn.vuetifyjs.com/images/lists/4.jpg"
-    },
-    {
-      username: "skyfly",
-      avatar: "https://cdn.vuetifyjs.com/images/lists/5.jpg"
     }
   ].map(c => new Contact(c));
 
@@ -167,9 +60,15 @@ export default class Chat extends VuexModule {
     let index = this.conversations.findIndex(c => payload.id === c.id);
     this.conversations[index].messages = payload.data;
   }
-  @Mutation set_conversation(payload: { id: number; data: object }) {
-    let index = this.conversations.findIndex(c => payload.id === c.id);
-    this.conversations[index] = payload.data;
+  @Mutation set_conversations(conversations: Array<Conversation>) {
+    this.conversations = conversations;
+  }
+  @Mutation set_conversation_unread(index: string) {
+    // shift conversation to front of the list
+    if (index > 0) {
+      let newest = this.conversations.splice(index, 1);
+      this.conversations.unshift(newest[0]);
+    }
   }
   @Mutation new_conversation(conversation: Conversation) {
     this.conversations.unshift(conversation);
@@ -191,9 +90,6 @@ export default class Chat extends VuexModule {
     let index: number = this.conversations.findIndex(c => data.id === c.id);
     this.conversations[index].members = data.recipients;
   }
-  @Mutation set_active_conversation(id: number) {
-    this.active = id;
-  }
   @Mutation deactivate_conversation(id: number) {
     let index: number = this.conversations.findIndex(c => id === c.id);
     this.conversations[index].active = false;
@@ -212,73 +108,80 @@ export default class Chat extends VuexModule {
       this.conversations.splice(index, 1);
     }
   }
-  @Mutation new_message(message: Message) {
-    let index = this.conversations.findIndex(c => message.convoID === c.id);
-    this.conversations[index].messages.push(message);
-    if (index > 0) {
-      let newest = this.conversations.splice(index, 1);
-      this.conversations.unshift(newest[0]);
-    }
+  @Mutation set_active_conversation(id: number) {
+    this.active = id;
   }
 
   // Actions
-
-  @Action async load_conversations() {
-    var query = firebase
-      .firestore()
-      .collection("chats")
-      .limit(12);
-
+  @Action({ commit: "set_contacts" }) load_contacts() {
+    return [new Contact()];
+  }
+  @Action async sync() {
     let t = this;
-    query
+    let uid = "IO5H06wVMXh7LXNnscLuDiwuzHf1"; // lookup with context.rootState.instance.getUID not working?
+    var db = firebase.firestore();
+    let userQuery = db.collection("users").doc("IO5H06wVMXh7LXNnscLuDiwuzHf1");
+
+    userQuery
       .get()
-      .then(function(querySnapshot) {
-        querySnapshot.forEach(function(doc) {
-          // doc.data() is never undefined for query doc snapshots
-          t.context.commit("set_conversation", {
-            id: doc.id,
-            data: new Conversation(doc.data())
+      .then(function(userDoc) {
+        if (userDoc.exists) {
+          let user = userDoc.data();
+
+          let contacts = user.contacts ? user.contacts : [];
+          t.context.commit("set_contacts", contacts);
+
+          let conversations = user.conversations ? user.conversations : {};
+          Object.keys(conversations).forEach((id: string) => {
+            let convo = conversations[id];
+            var convoQuery = db.collection("chats").doc(id);
+
+            convoQuery
+              .get()
+              .then(function(convoDoc) {
+                if (convoDoc.exists) {
+                  t.context.commit("set_conversations", convoDoc.data());
+
+                  var messagesQuery = convoQuery
+                    .collection("messages")
+                    .orderBy("timestamp")
+                    .limit(12);
+
+                  // Start listening to the conversation
+                  messagesQuery.onSnapshot(function(snapshot) {
+                    var messages = t.conversations[id].messages;
+                    snapshot.docChanges().forEach(function(change) {
+                      messages.push(new Message(change.doc.data()));
+                    });
+                    t.context.commit("set_messages", {
+                      id: convo,
+                      data: messages
+                    });
+                    t.context.commit("set_conversation_unread", id);
+                  });
+                } else {
+                  console.log("convo missing");
+                }
+              })
+              .catch(function(error) {
+                console.error("Error getting documents: ", error);
+              });
           });
-          console.log(doc.id, " => ", doc.data());
-        });
+        } else {
+          console.log("user missing");
+        }
       })
       .catch(function(error) {
         console.log("Error getting documents: ", error);
       });
   }
-  @Action({ commit: "set_contacts" }) load_contacts() {
-    return [new Contact()];
-  }
-  @Action async listen(id: string) {
-    let chatID = id ? id : "public";
-    var query = firebase
+  @Action send_message(message: Message) {
+    return firebase
       .firestore()
       .collection("chats")
-      .doc(chatID)
+      .doc(this.active + "")
       .collection("messages")
-      .orderBy("timestamp")
-      .limit(12);
-
-    let t = this;
-    // Start listening to the query.
-    query.onSnapshot(function(snapshot) {
-      var index: number = t.conversations.findIndex(c => t.active === c.id);
-      var messages = t.conversations[index].messages;
-      snapshot.docChanges().forEach(function(change) {
-        if (change.type === "removed") {
-          //deleteMessage(change.doc.id);
-        } else {
-          var message = change.doc.data();
-          messages.push(new Message(message));
-        }
-      });
-      t.context.commit("set_conversation", messages);
-    });
-  }
-  @Action({ commit: "set_active_conversation" }) async select_conversation(
-    id: number
-  ) {
-    return id;
+      .add(message);
   }
   @Action({ commit: "new_conversation" }) start_conversation(
     conversation: Conversation
@@ -293,9 +196,6 @@ export default class Chat extends VuexModule {
   ) {
     return id;
   }
-  @Action({ commit: "new_message" }) send_message(message: Message) {
-    return message;
-  }
   @Action({ commit: "set_active_recipients" }) set_recipients(
     recipients: Array<Contact>
   ) {
@@ -303,6 +203,11 @@ export default class Chat extends VuexModule {
   }
   @Action({ commit: "set_convo_prop" }) update_conversation(data: PropUpdate) {
     return data;
+  }
+  @Action({ commit: "set_active_conversation" }) async select_conversation(
+    id: number
+  ) {
+    return id;
   }
 
   // Getters
