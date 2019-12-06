@@ -7,9 +7,9 @@
         v-stepper-step(:complete="step > 1" step="1") Upload
         v-stepper-step(:complete="step > 2" step="2") Info
         v-stepper-step(:complete="step > 3" step="3") Verify
-        v-stepper-step(:complete="step > 4" step="4") Done
+        v-stepper-step(:complete="step === 4" step="4") Done
       v-stepper-items
-        v-stepper-content(step="1")
+        v-stepper-content(step="1").ma-5
           h3 Select files to Upload
           p Image, audio and video files supported
           v-btn(@click="fileDialog = true").ma-5
@@ -18,18 +18,18 @@
         v-stepper-content(step="2")
           v-form(v-model="valid" ref="info")
             v-text-field(v-for="(field,i) in fields" :label="field.label" :required="field.required" v-model="fields[i].value")
-            v-btn(:disabled="!valid" @click="verifyInfo") Next
+            v-btn(:disabled="!valid" @click="verifyInfo").ma-5 Next
         v-stepper-content(step="3")
           h3 Verify and Submit
           h4(v-for="field in fields") {{field.label}}: {{field.value}}
-          v-btn(@click="setInfo") Submit
+          v-btn(@click="setInfo").ma-5 Submit
         v-stepper-content(step="4")
           h2 Content Submited
           h4 add a content preview here
           br
           v-divider
           br
-          v-btn(@click="reset") Upload More Content
+          v-btn(@click="reset").ma-5 Upload More Content
 </template>
 
 <script lang="ts">
