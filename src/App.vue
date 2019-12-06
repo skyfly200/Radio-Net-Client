@@ -29,7 +29,8 @@ import firebase from "firebase";
   data: () => ({
     showChat: true
   }),
-  methods: {}
+  methods: {
+  }
 })
 export default class App extends Vue {}
 </script>

@@ -72,6 +72,8 @@
 </template>
 <script>
 import firebase from "firebase";
+import Vue from "vue";
+import { VueReCaptcha } from "vue-recaptcha-v3";
 
 export default {
   components: {},
@@ -85,15 +87,33 @@ export default {
     ],
     subscribed: false
   }),
+  mounted() {
+    Vue.use(VueReCaptcha, { siteKey: process.env.VUE_APP_RECAPTCHA_SITE_KEY });
+  },
   methods: {
-    subscribe() {
+    async recaptcha(action) {
+      try {
+        // (optional) Wait until recaptcha has been loaded.
+        await this.$recaptchaLoaded();
+
+        // Execute reCAPTCHA with provided action
+        const token = await this.$recaptcha(action);
+        return token;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    subscribe: async function() {
       let t = this;
       var db = firebase.firestore();
+      let recaptcha = await this.recaptcha("newsletter");
       db.collection("newsletter")
         .add({
           email: this.email,
           name: this.name,
-          subscribedAt: firebase.firestore.FieldValue.serverTimestamp()
+          subscribedAt: new Date(),
+          ua: navigator.userAgent,
+          recaptcha: recaptcha
         })
         .then(function() {
           t.subscribed = true;
@@ -105,3 +125,7 @@ export default {
   }
 };
 </script>
+<style lang="sass" scoped>
+.grecaptcha-badge
+  display: none
+</style>
