@@ -125,7 +125,4 @@ export default {
   }
 };
 </script>
-<style lang="sass" scoped>
-.grecaptcha-badge
-  display: none
-</style>
+<style lang="sass" scoped></style>

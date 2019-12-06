@@ -29,8 +29,7 @@ import firebase from "firebase";
   data: () => ({
     showChat: true
   }),
-  methods: {
-  }
+  methods: {}
 })
 export default class App extends Vue {}
 </script>
@@ -42,6 +41,8 @@ export default class App extends Vue {}
   -moz-osx-font-smoothing: grayscale
   text-align: center
   color: #2c3e50
+.grecaptcha-badge
+  display: none !important
 .container
   padding: 0 12px
 </style>
