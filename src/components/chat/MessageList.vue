@@ -2,7 +2,7 @@
   .messages
     v-fade-transition(group)
       Message.message(v-for="m in conversation.messages"
-        :key="getTime(m.timestamp)"
+        :key="m.author+'/'+m.timestamp"
         :author="m.author",
         :avatar="getAvatar(m.author)",
         :body="m.body",
