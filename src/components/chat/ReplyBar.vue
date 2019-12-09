@@ -9,7 +9,7 @@
         v-model="reply" label="Reply" :disabled="disabled")
       v-menu(v-model="showEmojiPicker" activator="textarea" :close-on-content-click="false" :disabled="disabled")
         Picker(v-show="showEmojiPicker" style="width: auto !importiant" title="Select Emoji" emoji="point_up" set="messenger" @select="addEmoji")
-      v-btn(fab small color="green" :disabled="disabled" @click="send")
+      v-btn(fab small color="green" :disabled="disabled" @click="send").ma-2
         v-icon mdi-send
     v-card.link-loader(v-show="previewState === 'loading'")
       v-progress-circular(indeterminate)
