@@ -6,6 +6,9 @@ import "./registerServiceWorker";
 import * as firebase from "firebase";
 import vuetify from "./plugins/vuetify";
 import VueChatScroll from "vue-chat-scroll";
+import axios from "axios";
+
+Vue.prototype.$http = axios;
 
 Vue.use(VueChatScroll);
 
