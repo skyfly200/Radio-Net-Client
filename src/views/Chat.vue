@@ -49,7 +49,7 @@ var db = firebase.firestore();
       return this.conversations[0] && this.conversations[0].members.length <= 1;
     },
     username: function() {
-      return this.getUser.displayName;
+      return this.getUser.name;
     },
     ...mapGetters({
       getUser: "getUser",
@@ -64,13 +64,11 @@ var db = firebase.firestore();
   methods: {
     sendMessage: function(body) {
       if (this.isRecipients) {
-        let message = {
-          convoID: this.active,
-          author: this.getUser ? this.username : "guest",
+        this.$store.dispatch("send_message", {
+          author: this.username ? this.username : "guest",
           body: body,
           timestamp: new Date()
-        };
-        this.$store.dispatch("send_message", new Message(message));
+        });
       }
     },
     newConversation: function() {

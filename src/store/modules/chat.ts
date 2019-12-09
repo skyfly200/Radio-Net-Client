@@ -152,7 +152,7 @@ export default class Chat extends VuexModule {
         console.log("Error getting documents: ", error);
       });
   }
-  @Action send_message(message: Message) {
+  @Action send_message(message: object) {
     return firebase
       .firestore()
       .collection("chats")
