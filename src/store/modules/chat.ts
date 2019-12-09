@@ -18,65 +18,48 @@ function hasKey<O>(obj: O, key: string | number | symbol): key is keyof O {
 
 @Module
 export default class Chat extends VuexModule {
-  active: number = new Date(2018, 11, 28).getTime();
+  active: string = "public";
   contacts: Array<Contact> = [];
+  conversationsList: Array<object> = [];
   conversations: Array<Conversation> = [];
-  //   {
-  //     id: new Date(2018, 11, 28).getTime(),
-  //     unread: false,
-  //     active: true,
-  //     title: "The Group",
-  //     styles: {
-  //       color: "default",
-  //       density: "medium"
-  //     },
-  //     notifications: {
-  //       state: true
-  //     },
-  //     created: new Date(2018, 11, 28),
-  //     creator: "test",
-  //     members: [
-  //       {
-  //         username: "skyfly",
-  //         avatar: "https://cdn.vuetifyjs.com/images/lists/5.jpg"
-  //       }
-  //     ],
-  //     messages: [
-  //       { author: "test", body: "Another from you", timestamp: new Date() }
-  //     ]
-  //   }
-  // ].map(c => new Conversation(c));
 
   // Mutations
   @Mutation set_contacts(contacts: Array<Contact>) {
     this.contacts = contacts;
   }
-  @Mutation set_messages(payload: { id: number; data: object }) {
+  @Mutation set_messages(payload: { id: string; data: object }) {
     let index = this.conversations.findIndex(c => payload.id === c.id);
     this.conversations[index].messages = payload.data;
   }
-  @Mutation set_conversations(conversations: Array<Conversation>) {
-    this.conversations = conversations;
-  }
-  @Mutation set_conversation_unread(index: string) {
-    // shift conversation to front of the list
-    if (index > 0) {
-      let newest = this.conversations.splice(index, 1);
-      this.conversations.unshift(newest[0]);
+  @Mutation add_message(payload: { id: string; data: object }) {
+    let index = this.conversations.findIndex(c => payload.id === c.id);
+    if (this.conversations[index]) {
+      if (this.conversations[index].messages) {
+        this.conversations[index].messages.push(payload.data);
+      } else {
+        this.conversations[index].messages = [payload.data];
+      }
+    } else {
+      console.log(this.conversations);
     }
   }
-  @Mutation new_conversation(conversation: Conversation) {
-    this.conversations.unshift(conversation);
+  @Mutation set_conversations_list(conversations: object) {
+    this.conversationsList = conversations;
+  }
+  @Mutation set_conversations(conversations: object) {
+    this.conversations = conversations;
+  }
+  @Mutation set_conversation(conversation: object) {
+    this.conversations.push(new Conversation(conversation));
   }
   @Mutation set_convo_prop(data: PropUpdate) {
-    let index: number = this.conversations.findIndex(c => data.id === c.id);
+    let index = this.conversations.findIndex(c => this.active === c.id);
     if (hasKey(this.conversations[index], data.property)) {
       this.conversations[index][data.property] = data.value;
     }
   }
   @Mutation set_active_recipients(recipients: Array<Contact>) {
-    let index: number = this.conversations.findIndex(c => this.active === c.id);
-    this.conversations[index].members = recipients;
+    this.conversations[this.active].members = recipients;
   }
   @Mutation update_recipients(data: {
     id: number;
@@ -115,7 +98,7 @@ export default class Chat extends VuexModule {
     let t = this;
     let uid = "IO5H06wVMXh7LXNnscLuDiwuzHf1"; // lookup with context.rootState.instance.getUID not working?
     var db = firebase.firestore();
-    let userQuery = db.collection("users").doc("IO5H06wVMXh7LXNnscLuDiwuzHf1");
+    let userQuery = db.collection("users").doc(uid);
 
     userQuery
       .get()
@@ -125,18 +108,20 @@ export default class Chat extends VuexModule {
 
           let contacts = user.contacts ? user.contacts : [];
           t.context.commit("set_contacts", contacts);
+          let conversations = user.conversations ? user.conversations : [];
+          t.context.commit("set_conversations_list", conversations);
 
-          let conversations = user.conversations ? user.conversations : {};
-          Object.keys(conversations).forEach((id: string) => {
-            let convo = conversations[id];
+          conversations.forEach(c => {
+            let id: string = c.id;
             var convoQuery = db.collection("chats").doc(id);
 
             convoQuery
               .get()
               .then(function(convoDoc) {
                 if (convoDoc.exists) {
-                  t.context.commit("set_conversations", convoDoc.data());
-
+                  let convo = convoDoc.data();
+                  convo.id = id;
+                  t.context.commit("set_conversation", convo);
                   var messagesQuery = convoQuery
                     .collection("messages")
                     .orderBy("timestamp")
@@ -144,15 +129,12 @@ export default class Chat extends VuexModule {
 
                   // Start listening to the conversation
                   messagesQuery.onSnapshot(function(snapshot) {
-                    var messages = t.conversations[id].messages;
                     snapshot.docChanges().forEach(function(change) {
-                      messages.push(new Message(change.doc.data()));
+                      t.context.commit("add_message", {
+                        id: id,
+                        data: new Message(change.doc.data())
+                      });
                     });
-                    t.context.commit("set_messages", {
-                      id: convo,
-                      data: messages
-                    });
-                    t.context.commit("set_conversation_unread", id);
                   });
                 } else {
                   console.log("convo missing");
@@ -178,10 +160,10 @@ export default class Chat extends VuexModule {
       .collection("messages")
       .add(message);
   }
-  @Action({ commit: "new_conversation" }) start_conversation(
+  @Action({ commit: "set_conversation" }) start_conversation(
     conversation: Conversation
   ) {
-    return conversation;
+    return { id: "new", conversation: conversation };
   }
   @Action({ commit: "remove_conversation" }) delete_conversation(id: number) {
     return id;
@@ -211,14 +193,15 @@ export default class Chat extends VuexModule {
     return this.active;
   }
   get getActiveConversation() {
-    return this.conversations.find((c: Conversation) => c.id === this.active);
+    let index: number = this.conversations.findIndex(c => this.active === c.id);
+    return this.conversations[index];
   }
   get getConversations() {
     return this.conversations;
   }
   get getConversation() {
     return (id: Number) => {
-      return this.conversations.find((c: Conversation) => c.id === id);
+      return this.conversations[id];
     };
   }
   get getContacts() {
@@ -226,7 +209,7 @@ export default class Chat extends VuexModule {
   }
   get getContact() {
     return (username: string) => {
-      return this.contacts.find(c => c.username === username);
+      return this.contacts[username];
     };
   }
 }

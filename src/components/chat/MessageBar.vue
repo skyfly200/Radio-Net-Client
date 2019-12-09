@@ -1,7 +1,7 @@
 <template lang="pug">
   v-toolbar.view-toolbar(flat dense)
     template(v-if="menu === 'recipients' || !isRecipients")
-      UserSelector(:previous="getOthers(conversation.members)" :contacts="getOthers(contacts)" @done="updateRecipients($event)")
+      UserSelector(:previous="otherMembers" :contacts="getOthers(contacts)" @done="updateRecipients($event)")
     template(v-else-if="menu === 'search'")
       v-text-field.search(name="search" label="Search Conversation" single-line full-width hide-details clearable
         v-model="query"
@@ -70,21 +70,27 @@ import UserSelector from "@/components/chat/UserSelector.vue";
       query: ""
     };
   },
-  created: function() {
-    this.title = this.conversation.title;
-  },
   computed: {
     name: function() {
       return this.$store.getters.getUser.name;
     },
-    isMulti: function() {
-      return this.conversation.members.length > 2;
-    },
     isOwner: function() {
       return this.conversation.creator === this.$store.getters.getUser.name;
     },
+    isMulti: function() {
+      return this.conversation.members.length > 2;
+    },
+    otherMembers: function() {
+      return (
+        this.conversation !== undefined &&
+        this.getOthers(this.conversation.members)
+      );
+    },
     isRecipients: function() {
-      return this.conversation.members.length > 1;
+      return (
+        this.conversation !== undefined &&
+        this.getOthers(this.conversation.members).length > 0
+      );
     }
   },
   methods: {

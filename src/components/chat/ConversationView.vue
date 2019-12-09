@@ -44,8 +44,8 @@
                 li(v-for="m in conversation.members") {{ m.username }}
         v-btn(@click="pane = ''" color="primary") Done
       template(v-else-if="conversation")
-        MessageList(:conversation="conversation" :contacts="contacts")
-        ReplyBar(@send="$emit('sendMessage', $event)" :disabled="!isRecipients || !conversation.active")
+        MessageList(:conversation="conversation")
+        ReplyBar(@send="$emit('sendMessage', $event)" :disabled="!isRecipients")
       template(v-else)
         .pane
           h2.pane-title No conversations!

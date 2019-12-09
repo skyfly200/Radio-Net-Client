@@ -26,6 +26,9 @@ import firebase from "firebase";
       this.showChat = !["chat"].includes(to.name);
     }
   },
+  mounted() {
+    this.$store.dispatch("sync");
+  },
   data: () => ({
     showChat: true
   }),

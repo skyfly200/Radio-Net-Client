@@ -18,7 +18,7 @@ import { format, isToday, isThisWeek, isThisYear, getTime } from "date-fns";
 
 @Component({
   components: { Message },
-  props: ["conversation", "contacts"],
+  props: ["conversation"],
   computed: {
     username: function() {
       return this.$store.getters.isLoggedIn
@@ -30,19 +30,20 @@ import { format, isToday, isThisWeek, isThisYear, getTime } from "date-fns";
     }
   },
   methods: {
-    formatTimestamp: function(t) {
+    formatTimestamp: function(x) {
+      let t = x.toDate();
       let f = isToday(t)
         ? format(t, "h:mm a")
         : isThisWeek(t)
-        ? format(t, "ddd")
+        ? format(t, "EEE")
         : isThisYear
-        ? format(t, "MMM Do")
+        ? format(t, "MMM do")
         : format(t, "M/D/YY");
       return f;
     },
     getTime: getTime,
     getAvatar: function(author) {
-      var member = this.contacts.find(m => m.username === author);
+      var member = this.conversation.members.find(m => m.username === author);
       return member ? member.avatar : "";
     }
   }

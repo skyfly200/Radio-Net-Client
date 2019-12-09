@@ -1,7 +1,7 @@
 <template lang="pug">
 v-list-item.conversation(@click="$emit('select')")
   v-list-item-avatar
-    v-img(v-if="c.members.length > 1" :src="selectConvoAvatar(c)")
+    v-img(v-if="isOthers" :src="selectConvoAvatar(c)")
     v-icon(v-else large) mdi-account
   v-list-item-content(:class="{ unread: c.unread }")
     v-list-item-title
@@ -22,16 +22,20 @@ import { format, isToday, isThisWeek, isThisYear } from "date-fns";
   computed: {
     username: function() {
       return this.$store.getters.getUser.username;
+    },
+    isOthers: function() {
+      return this.c.members.length > 1;
     }
   },
   methods: {
-    formatTimestamp: function(t) {
+    formatTimestamp: function(x) {
+      let t = x.toDate();
       let f = isToday(t)
         ? format(t, "h:mm a")
         : isThisWeek(t)
-        ? format(t, "ddd")
+        ? format(t, "EEE")
         : isThisYear
-        ? format(t, "MMM Do")
+        ? format(t, "MMM do")
         : format(t, "M/D/YY");
       return f;
     },

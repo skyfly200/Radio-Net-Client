@@ -61,9 +61,6 @@ var db = firebase.firestore();
       activeConvo: "getActiveConversation"
     })
   },
-  mounted() {
-    this.$store.dispatch("sync");
-  },
   methods: {
     sendMessage: function(body) {
       if (this.isRecipients) {
