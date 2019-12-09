@@ -3,7 +3,7 @@
     <v-layout row wrap>
       <v-flex class="mx-5">
         <v-form v-if="register" ref="form" v-model="valid" lazy-validation>
-          <v-text-field v-model="name" label="Display Name" required></v-text-field>
+          <v-text-field v-model="name" label="Name" required></v-text-field>
           <v-text-field v-model="email" :rules="emailRules" label="E-mail" required></v-text-field>
 
           <v-text-field
