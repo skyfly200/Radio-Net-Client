@@ -86,7 +86,7 @@ export default class Chat extends VuexModule {
       this.conversations.splice(index, 1);
     }
   }
-  @Mutation set_active_conversation(id: number) {
+  @Mutation set_active_conversation(id: string) {
     this.active = id;
   }
 
@@ -162,11 +162,11 @@ export default class Chat extends VuexModule {
   ) {
     return { id: "new", conversation: conversation };
   }
-  @Action({ commit: "remove_conversation" }) delete_conversation(id: number) {
+  @Action({ commit: "remove_conversation" }) delete_conversation(id: string) {
     return id;
   }
   @Action({ commit: "deactivate_conversation" }) leave_conversation(
-    id: number
+    id: string
   ) {
     return id;
   }
@@ -179,7 +179,7 @@ export default class Chat extends VuexModule {
     return data;
   }
   @Action({ commit: "set_active_conversation" }) async select_conversation(
-    id: number
+    id: string
   ) {
     return id;
   }
@@ -197,7 +197,7 @@ export default class Chat extends VuexModule {
     return this.conversations;
   }
   get getConversation() {
-    return (id: Number) => {
+    return (id: string) => {
       return this.conversations[id];
     };
   }

@@ -35,9 +35,6 @@ var db = firebase.firestore();
 
 @Component({
   components: { ConversationIndex, ConversationView },
-  mounted() {
-    this.$store.dispatch("sync", this.$store.getters.getUID);
-  },
   computed: {
     isMulti: function() {
       return this.activeConvo.members.length > 2;

@@ -14,13 +14,13 @@
         v-icon mdi-message
     v-slide-y-reverse-transition
       v-toolbar(v-show="showChatBar" dense bottom tile)
-        v-btn(v-if="userLoggedIn" icon @click.stop.prevent="" text)
+        v-btn(v-if="userLoggedIn" icon @click.stop.prevent text)
           v-icon mdi-plus
         v-spacer
         v-menu(
-          v-model="menu"
-          v-for="chat in chats"
-          :key="chat.id"
+          v-for="convo in conversations"
+          v-model="menu[convo.id]"
+          :key="convo.id"
           top
           offset-y
           nudge-top="6"
@@ -29,14 +29,14 @@
           :close-on-click="false"
           :close-on-content-click="false")
           template(v-slot:activator="{ on }")
-            v-btn(v-on="on" @click.stop.prevent="" text)
-              span {{ chat.title }}
+            v-btn(v-on="on" @click.stop.prevent text)
+              span {{ convo.title }}
           v-sheet(height="50vh" width="300px")
             conversation-view(
               :contacts="contacts"
-              :conversation="activeConvo"
+              :conversation="convo"
               @sendMessage="sendMessage($event)"
-              @updateTitle="activeConvo.title = $event"
+              @updateTitle="convo.title = $event"
               @updateRecipients="updateRecipients($event)"
               @leave="leaveConvo($event)"
               @delete="deleteConvo($event)")
@@ -58,8 +58,7 @@ export default {
   data() {
     return {
       showChatBar: false,
-      menu: false,
-      chats: [{ title: "Public", id: "public" }]
+      menu: { public: false }
     };
   },
   computed: {
@@ -76,7 +75,7 @@ export default {
       return this.conversations[0] && this.conversations[0].members.length <= 1;
     },
     username: function() {
-      return this.getUser.username;
+      return this.getUser.name;
     },
     ...mapGetters({
       getUser: "getUser",
@@ -91,19 +90,12 @@ export default {
   },
   methods: {
     sendMessage: function(body) {
-      if (this.isFirst) {
-        pass;
-        //this.$socket.emit('start_conversation', this.activeConvo);
-      }
       if (this.isRecipients) {
-        let message = {
-          convoID: this.active,
-          author: this.username,
+        this.$store.dispatch("send_message", {
+          author: this.username ? this.username : "guest",
           body: body,
           timestamp: new Date()
-        };
-        //this.$socket.emit('message', this.active, message);
-        this.$store.dispatch("send_message", new Message(message));
+        });
       }
     },
     newConversation: function() {
@@ -142,6 +134,7 @@ export default {
     },
     deleteConvo: function(i) {
       this.$store.dispatch("delete_conversation", i);
+      // TO-DO remove coversation from users list
     },
     leaveConvo: function(i) {
       this.$store.dispatch("leave_conversation", i);
@@ -153,9 +146,7 @@ export default {
       });
       let allRecpients = recipients;
       allRecpients.push(self);
-      if (!this.isFirst)
-        //this.$socket.emit('set_recipients', allRecpients, this.activeConvo);
-        this.$store.dispatch("set_recipients", allRecpients);
+      if (!this.isFirst) this.$store.dispatch("set_recipients", allRecpients);
     }
   }
 };
