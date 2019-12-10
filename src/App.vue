@@ -26,9 +26,8 @@ import firebase from "firebase";
       this.showChat = !["chat"].includes(to.name);
     }
   },
-  mounted() {
+  created() {
     this.$store.dispatch("syncAuth").then(authed => {
-      console.log("Authed: ", authed);
       this.$store.dispatch("sync", this.$store.getters.getUID);
     });
   },

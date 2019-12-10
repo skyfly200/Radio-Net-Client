@@ -13,7 +13,7 @@
         fab)
         v-icon mdi-message
     v-slide-y-reverse-transition
-      v-toolbar(v-show="showChatBar" dense bottom tile)
+      v-toolbar(v-show="showChatBar" dense bottom tile).toolbar
         v-btn(v-if="userLoggedIn" icon @click.stop.prevent text)
           v-icon mdi-plus
         v-spacer
@@ -153,4 +153,8 @@ export default {
 </script>
 <style lang="sass" scoped>
 .chat-window
+.toolbar
+  position: fixed
+  width: 100%
+  bottom: 0
 </style>
