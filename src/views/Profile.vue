@@ -89,7 +89,7 @@ v-container(fluid grid-list-md).profile
 <script>
 import { Component, Vue } from "vue-property-decorator";
 import { format } from "date-fns";
-import firebase from "firebase";
+import firebase, { firestore } from "firebase";
 
 import ImgUpload from "@/components/ImgUpload.vue";
 import ImgEditHover from "@/components/ImgEditHover.vue";
@@ -147,6 +147,23 @@ var db = firebase.firestore();
     updateImg: function(url) {
       let map = { profile: "profileImg", header: "headerImg" };
       this.imageDialog = false;
+      // update avatar for all conversations
+      if (this.imageDialogType === "profile") {
+        let id = "public"; // TO-DO get coversationsList and iterate over id fields
+        let query = db.collection("chats").doc(id);
+        query.update({
+          members: firebase.firestore.FieldValue.arrayRemove({
+            avatar: this.user.profileImg,
+            username: this.user.name
+          })
+        });
+        query.update({
+          members: firebase.firestore.FieldValue.arrayUnion({
+            avatar: url,
+            username: this.user.name
+          })
+        });
+      }
       this.user[map[this.imageDialogType]] = url;
       // save new img url to firestore
       this.save(map[this.imageDialogType]);
