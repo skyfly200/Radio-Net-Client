@@ -1,7 +1,5 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import router from "../router";
-import firebase from "firebase";
 
 import Chat from "./modules/chat";
 import Auth from "./modules/auth";

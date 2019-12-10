@@ -58,4 +58,7 @@ import ConvoList from "@/components/chat/ConvoList.vue";
 })
 export default class ConversationIndex extends Vue {}
 </script>
-<style lang="sass" scoped></style>
+<style lang="sass" scoped>
+.conversations
+  height: 100%
+</style>

@@ -1,10 +1,4 @@
-import {
-  Module,
-  VuexModule,
-  Mutation,
-  Action,
-  MutationAction
-} from "vuex-module-decorators";
+import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
 import firebase from "firebase";
 
 import { Conversation } from "@/models/conversation";
@@ -94,9 +88,8 @@ export default class Chat extends VuexModule {
   @Action({ commit: "set_contacts" }) load_contacts() {
     return [new Contact()];
   }
-  @Action async sync() {
+  @Action async sync(uid: string) {
     let t = this;
-    let uid = "IO5H06wVMXh7LXNnscLuDiwuzHf1"; // lookup with context.rootState.instance.getUID not working?
     var db = firebase.firestore();
     let userQuery = db.collection("users").doc(uid);
 
@@ -111,27 +104,25 @@ export default class Chat extends VuexModule {
           let conversations = user.conversations ? user.conversations : [];
           t.context.commit("set_conversations_list", conversations);
 
-          conversations.forEach(c => {
-            let id: string = c.id;
-            var convoQuery = db.collection("chats").doc(id);
+          conversations.forEach((c: object) => {
+            var convoQuery = db.collection("chats").doc(c.id);
 
             convoQuery
               .get()
               .then(function(convoDoc) {
                 if (convoDoc.exists) {
                   let convo = convoDoc.data();
-                  convo.id = id;
+                  convo.id = c.id;
                   t.context.commit("set_conversation", convo);
                   var messagesQuery = convoQuery
                     .collection("messages")
-                    .orderBy("timestamp")
-                    .limit(12);
+                    .orderBy("timestamp");
 
                   // Start listening to the conversation
                   messagesQuery.onSnapshot(function(snapshot) {
                     snapshot.docChanges().forEach(function(change) {
                       t.context.commit("add_message", {
-                        id: id,
+                        id: c.id,
                         data: new Message(change.doc.data())
                       });
                     });
