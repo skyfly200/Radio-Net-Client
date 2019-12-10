@@ -1,8 +1,8 @@
-<template>
-  <div class="chat-bar">
-    <v-spacer />
-    <v-fab-transition>
-      <v-btn
+<template lang="pug">
+  .chat-bar
+    v-spacer
+    v-fab-transition
+      v-btn(
         v-show="!showChatBar"
         @click="showChatBar = !showChatBar"
         fixed
@@ -10,18 +10,14 @@
         right
         color="blue darken-2"
         dark
-        fab
-      >
-        <v-icon>mdi-message</v-icon>
-      </v-btn>
-    </v-fab-transition>
-    <v-slide-y-reverse-transition>
-      <v-toolbar v-show="showChatBar" dense bottom tile>
-        <v-btn v-if="userLoggedIn" icon @click.stop.prevent="" text>
-          <v-icon>mdi-plus</v-icon>
-        </v-btn>
-        <v-spacer />
-        <v-menu
+        fab)
+        v-icon mdi-message
+    v-slide-y-reverse-transition
+      v-toolbar(v-show="showChatBar" dense bottom tile)
+        v-btn(v-if="userLoggedIn" icon @click.stop.prevent="" text)
+          v-icon mdi-plus
+        v-spacer
+        v-menu(
           v-model="menu"
           v-for="chat in chats"
           :key="chat.id"
@@ -31,31 +27,21 @@
           origin="bottom center"
           transition="scale-transition"
           :close-on-click="false"
-          :close-on-content-click="false"
-        >
-          <template v-slot:activator="{ on }">
-            <v-btn v-on="on" @click.stop.prevent text>
-              <span>{{ chat.title }}</span>
-            </v-btn>
-          </template>
-          <v-sheet height="50vh" width="300px">
-            <conversation-view
+          :close-on-content-click="false")
+          template(v-slot:activator="{ on }")
+            v-btn(v-on="on" @click.stop.prevent="" text)
+              span {{ chat.title }}
+          v-sheet(height="50vh" width="300px")
+            conversation-view(
               :contacts="contacts"
               :conversation="activeConvo"
               @sendMessage="sendMessage($event)"
               @updateTitle="activeConvo.title = $event"
               @updateRecipients="updateRecipients($event)"
               @leave="leaveConvo($event)"
-              @delete="deleteConvo($event)"
-            />
-          </v-sheet>
-        </v-menu>
-        <v-btn @click="showChatBar = !showChatBar" text small>
-          <v-icon>mdi-chevron-down</v-icon>
-        </v-btn>
-      </v-toolbar>
-    </v-slide-y-reverse-transition>
-  </div>
+              @delete="deleteConvo($event)")
+        v-btn(@click="showChatBar = !showChatBar" text small)
+          v-icon mdi-chevron-down
 </template>
 <script>
 import { mapGetters } from "vuex";
