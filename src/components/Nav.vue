@@ -110,6 +110,7 @@ export default {
       this.drawer = true;
     },
     signout() {
+      this.$store.dispatch("clearChat");
       this.$store.dispatch("signOutAction");
     }
   }

@@ -18,6 +18,12 @@ export default class Chat extends VuexModule {
   conversations: Array<Conversation> = [];
 
   // Mutations
+  @Mutation clearChat(contacts: Array<Contact>) {
+    this.active = "public";
+    this.contacts = [];
+    this.conversationsList = [];
+    this.conversations = [];
+  }
   @Mutation set_contacts(contacts: Array<Contact>) {
     this.contacts = contacts;
   }
