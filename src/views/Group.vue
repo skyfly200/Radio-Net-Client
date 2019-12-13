@@ -143,15 +143,17 @@ import ImgEditHover from "@/components/ImgEditHover.vue";
   }),
   watch: {
     $route(to, from) {
-      this.title = this.$route.params.title;
-      this.getGroup(this.title);
+      this.init();
     }
   },
   created() {
-    this.title = this.$route.params.title;
-    this.getGroup(this.title);
+    this.init();
   },
   computed: {
+    init() {
+      this.title = this.$route.params.title;
+      this.getGroup(this.title);
+    },
     dateCreated: function() {
       return this.dateFormat(this.group.created);
     },
