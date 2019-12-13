@@ -1,5 +1,5 @@
 <template lang="pug">
-  .messages
+  .messages(v-chat-scroll="{always: false, smooth: true, scrollonremoved:true, smoothonremoved: false}")
     v-fade-transition(group)
       Message.message(v-for="m in conversation.messages"
         :key="m.author+'/'+m.timestamp"
@@ -55,4 +55,7 @@ export default class MessageList extends Vue {}
   display: flex
   flex-direction: column
   justify-content: flex-end
+  height: 68vh
+  span
+    overflow-y: auto
 </style>

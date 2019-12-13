@@ -75,7 +75,7 @@ exports.podcast = functions.https.onRequest((req, res) => {
           "itunes:duration": "00:32:16",
           "itunes:explicit": "no"
         };
-        items.push(Object.assign(itemDefault, itemData));
+        items.push(Object.assign(itemDefault, itemData.xml));
       });
       // create the channel
       let channel = {
@@ -120,7 +120,7 @@ exports.podcast = functions.https.onRequest((req, res) => {
         },
         item: items
       };
-      Object.assign(channel, podcast);
+      Object.assign(channel, podcast.xml);
       // create the podcast data object
       let obj = {
         rss: {
