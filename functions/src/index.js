@@ -99,7 +99,8 @@ exports.podcast = functions.https.onRequest((req, res) => {
           "@text": "Music"
         },
         "itunes:image": {
-          "@href": "http://www.example.com/podcast-icon.jpg"
+          "@href":
+            "http://www.wayhighradio.com/uploads/1/9/7/4/1974686/ccrn-logo-02-border_1.jpg"
         },
         "atom10:link": {
           "@xmlns:atom10": "http://www.w3.org/2005/Atom",
