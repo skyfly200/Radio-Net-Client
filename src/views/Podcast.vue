@@ -1,36 +1,65 @@
 <template lang="pug">
   .podcasts
-    v-card.ma-3(v-if="podcast && podcast.xml")
-      v-card-title.center {{ podcast.xml.title }}
-      v-divider
-      v-card-text
-        v-container
-          v-row
-            v-col(cols="4")
-              v-img(v-if="podcast.xml.image && podcast.xml.image.url" :src="podcast.xml.image.url")
-            v-col(cols="6")
-              p {{ podcast.xml.description }}
-              p Last Update: {{ podcast.xml.lastBuildDate }}
-              audio(src="''" ref="player")
-        v-divider.ma-3
-        v-list(v-if="items !== []")
-          v-list-item(v-for="(item, index) in items" two-line)
-            v-list-item-content
-              v-list-item-title {{ item.xml.title }}
-              v-list-item-subtitle
-                p {{ item.xml.description }}
-                p {{ item.xml.pubDate }}
-            v-list-item-icon
-              v-btn(icon @click="playItem(index)")
-                v-icon {{ (playerState && play === index) ? "mdi-pause" : "mdi-play" }}
-        div(v-else-if="items = null")
-          h1 Podcast has no items
-        div(v-else)
-          h3 Loading
-          v-progress-circular(large)
-    v-card.ma-3(v-else)
-      v-card-title
-        h1 Podcast with id {{ id }} was not found
+    v-row(justify="start").ml-3
+      v-btn(to="/podcasts" text).mt-2 Back to Podcasts
+    v-card.ma-3
+      template(v-if="podcast && podcast.xml")
+        template(v-if="mode === 'view'")
+          v-card-title.center {{ podcast.xml.title }}
+          v-divider
+          v-card-text
+            v-container
+              v-row
+                v-col(cols="4")
+                  v-img(v-if="podcast.xml.image && podcast.xml.image.url" :src="podcast.xml.image.url")
+                v-col(cols="6")
+                  p {{ podcast.xml.description }}
+                  p Last Update: {{ podcast.xml.lastBuildDate }}
+                  v-btn(icon @click="mode = 'edit'")
+                    v-icon mdi-pencil
+                  v-btn(icon @click="mode = 'add'")
+                    v-icon mdi-plus
+                  v-btn(icon target="new" :href="'https://us-central1-community-radio-network.cloudfunctions.net/podcast?id='+id")
+                    v-icon mdi-rss
+                  audio(src="''" ref="player")
+            v-divider.ma-3
+            div(v-if="items.length === 0")
+              h3 Loading
+              v-progress-circular(indeterminate large)
+            v-list(v-else-if="items.length > 0")
+              v-list-item(v-for="(item, index) in items" two-line)
+                v-list-item-content
+                  v-list-item-title {{ item.xml.title }}
+                  v-list-item-subtitle
+                    p {{ item.xml.description }}
+                    p {{ item.xml.pubDate }}
+                v-list-item-icon
+                  v-btn(icon @click="playItem(index)")
+                    v-icon {{ (playerState && play === index) ? "mdi-pause" : "mdi-play" }}
+            div(v-else)
+              h1 Podcast has no items
+        template(v-else-if="mode === 'edit'")
+          v-card-title Edit Podcasts
+          v-card-text
+            v-form
+              v-text-field
+              v-text-field
+              v-text-field
+              v-text-field
+              v-btn(@click.stop="") Save
+        template(v-else-if="mode === 'add'")
+          v-card-title Add an item
+          v-card-text
+        template(v-else)
+          v-card-title Invalid Mode {{ mode }}
+      template(v-else-if="podcast === null")
+        v-card-title 
+          p Podcast with id {{ id }} was not found
+      template(v-else)
+        v-card-title
+          p Loading
+        v-card-text
+          v-progress-circular(indeterminate large)
 </template>
 
 <script lang="ts">
@@ -42,6 +71,7 @@ var db = firebase.firestore();
 
 export default Vue.extend({
   data: () => ({
+    mode: "view",
     id: "",
     podcast: {},
     items: [],
@@ -65,6 +95,8 @@ export default Vue.extend({
     },
     playItem(index) {
       this.play = index;
+      // TO-DO load all items into playlist and skip to index, so playback continues through items when done
+      // Auto stop stream player on play
       if (
         this.items[index] &&
         this.items[index].xml &&
