@@ -13,7 +13,7 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import Nav from "./components/Nav.vue";
-import ChatBar from "@/components/ChatBar.vue";
+import ChatBar from "@/components/chat/ChatBar.vue";
 import firebase from "firebase";
 
 @Component({
