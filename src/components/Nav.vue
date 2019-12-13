@@ -32,11 +32,6 @@
             v-icon mdi-information
           v-list-item-content
             v-list-item-title About
-        v-list-item(to='/podcasts')
-          v-list-item-action
-            v-icon mdi-podcast
-          v-list-item-content
-            v-list-item-title Podcasts
         template(v-if='userLoggedIn')
           v-list-item(to='/dashboard')
             v-list-item-action
@@ -48,16 +43,21 @@
               v-icon mdi-message
             v-list-item-content
               v-list-item-title Chat
-          v-list-item(to='/groups')
-            v-list-item-action
-              v-icon mdi-account-group
-            v-list-item-content
-              v-list-item-title Groups
           v-list-item(to='/share')
             v-list-item-action
               v-icon mdi-file-upload
             v-list-item-content
               v-list-item-title Upload
+        v-list-item(to='/groups')
+          v-list-item-action
+            v-icon mdi-account-group
+          v-list-item-content
+            v-list-item-title Groups
+        v-list-item(to='/podcasts')
+          v-list-item-action
+            v-icon mdi-podcast
+          v-list-item-content
+            v-list-item-title Podcasts
     v-app-bar(app dense dark)
       v-app-bar-nav-icon(@click="openDrawer")
       v-btn(text style="cursor: pointer" to="/") Radio Net
