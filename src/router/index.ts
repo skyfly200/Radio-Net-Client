@@ -23,6 +23,12 @@ const routes = [
       import(/* webpackChunkName: "podcasts" */ "@/views/Podcasts.vue")
   },
   {
+    path: "/podcast/:id",
+    name: "podcast",
+    component: () =>
+      import(/* webpackChunkName: "podcasts" */ "@/views/Podcast.vue")
+  },
+  {
     path: "/auth",
     name: "auth",
     component: () => import(/* webpackChunkName: "auth" */ "@/views/Auth.vue")
