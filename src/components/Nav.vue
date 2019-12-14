@@ -75,16 +75,20 @@
         template(v-else)
           v-btn(text to='/auth') Login
       template(v-slot:extension)
-        StreamPlayer
+        LiveBar(v-if="live")
+        StreamPlayer(v-else)
 </template>
 <script>
 import StreamPlayer from "@/components/StreamPlayer.vue";
+import LiveBar from "@/components/LiveBar.vue";
 export default {
   components: {
-    StreamPlayer
+    StreamPlayer,
+    LiveBar
   },
   data: function() {
     return {
+      live: true,
       drawer: false
     };
   },
