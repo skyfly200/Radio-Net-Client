@@ -1,39 +1,61 @@
 # radio-net-client
 
+The web platform for community radio stations
+
+Open Source Freeware
+
 ## Project setup
+
 ```
 npm install
 ```
 
 ### Compiles and hot-reloads for development
+
 ```
 npm run serve
 ```
 
 ### Compiles and minifies for production
+
 ```
 npm run build
 ```
 
-### Run your tests
+### Compiles and deploys cloud functions to production
+
+```
+cd /functions
+npm run deploy
+```
+
+## Testing
+
+### Run all tests
+
 ```
 npm run test
 ```
 
-### Lints and fixes files
-```
-npm run lint
-```
+### Run end-to-end tests
 
-### Run your end-to-end tests
 ```
 npm run test:e2e
 ```
 
-### Run your unit tests
+### Run unit tests
+
 ```
 npm run test:unit
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### Lints and fixes files
+
+```
+npm run lint
+```
+
+## Links
+
+[Way High Radio](http://wayhighradio.com/)
+[Colorado Community Radio Network](https://coloradocommunityradio.com/)
