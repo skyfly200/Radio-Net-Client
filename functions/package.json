@@ -18,8 +18,8 @@
     "@types/nodemailer": "^6.2.2",
     "axios": "^0.19.0",
     "date-fns": "^2.8.1",
-    "firebase-admin": "^8.6.0",
-    "firebase-functions": "^3.3.0",
+    "firebase-admin": "^11.4.1",
+    "firebase-functions": "^3.24.1",
     "nodemailer": "^6.3.1",
     "typescript": "^3.7.2",
     "xmlbuilder": "^13.0.2"
